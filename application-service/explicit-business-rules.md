@@ -70,8 +70,10 @@ class UserService {
     }
   }
 }
+```
 
-
+The updated test:
+```
 const repository = new UserRepository(db)
 const service = new UserService()
 const usecase = new ApplicationService(repository, service)
