@@ -34,3 +34,8 @@ class ApplicationService {
   }
 }
 ```
+
+# References
+
+1. [Email uniqueness as an aggregate invariant](https://enterprisecraftsmanship.com/posts/email-uniqueness-as-aggregate-invariant/)
+2. [Entity validation with visitors and extension methods](https://lostechies.com/jimmybogard/2007/10/24/entity-validation-with-visitors-and-extension-methods/)
