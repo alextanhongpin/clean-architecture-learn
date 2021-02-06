@@ -17,7 +17,7 @@ So what can be infer from this?
 - The repository that queries the user entity are _explicit_ (which is good)
 - The repository now have business logic (are filter logic business logic?) They can be part of the business rule, but the _domain service_ should still validate the entities returned by the repository. That is why the methods are called `findUserWithConfirmationToken`, and not `findUserWithValidConfirmationToken`. See below.
 - There are other example queries, especially those dealing with a collection of entities, or the aggregated result (e.g., `findRegisteredUserCountsSinceDate`, `findUsersThatRegisteredAfter` etc)
-- This could lead _explosion of methods_. However, this is much better than having a _generic repository_, e.g. `findBy(query)`. Also testing is much easier.
+- This could lead _explosion of methods_. However, this is much better than having a _generic repository_, e.g. `findBy(query)`, see [3]. Also testing is much easier.
 - At the moment, this is my go-to method.
 
 
@@ -132,3 +132,4 @@ class UserRepository {
 
 1. [Applied Domain-Driven Design (DDD), Part 3 - Specification Pattern](http://www.zankavtaskin.com/2013/10/applied-domain-driven-design-ddd-part-3.html)
 2. [SPECIFICATIONS, EXPRESSION TREES, AND NHIBERNATE](https://davefancher.com/2012/07/03/specifications-expression-trees-and-nhibernate/)
+3. [DDD: The Generic Repository](http://codebetter.com/gregyoung/2009/01/16/ddd-the-generic-repository/)
