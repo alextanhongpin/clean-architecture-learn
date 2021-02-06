@@ -76,7 +76,7 @@ func NewUser(email, password string) (User, error) {
 
 	if password == "" {
 		err.Add(ErrPasswordRequired)
-	} else if len(password) < 8 {
+	} else if len(password) < minPasswordLength {
 		err.Add(ErrPasswordTooShort)
 	}
 
