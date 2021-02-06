@@ -108,10 +108,18 @@ import (
 	"fmt"
 )
 
-var ErrEmailExists = errors.New("email exists")
+var (
+	ErrEmailExists              = errors.New("email exists")
+	ErrUnconfirmedEmailRequired = errors.New("unconfirmed email is required")
+
+	ErrDBUniqueConstraintViolation = errors.New("unique violation: email")
+)
 
 func main() {
-	fmt.Println("Hello, playground")
+	repo := new(UserRepository)
+	usecase := &UserUsecase{repo: repo}
+	fmt.Println(usecase.CreateUser(context.Background(), "john.doe@mail.com"))
+	fmt.Println(usecase.CreateUser(context.Background(), "john"))
 }
 
 // Entity.
@@ -126,9 +134,13 @@ func NewUnconfirmedUser(email string) *User {
 	}
 }
 
-func (u *User) ConfirmEmail() {
+func (u *User) ConfirmEmail() error {
+	if u.unconfirmedEmail == "" {
+		return ErrUnconfirmedEmailRequired
+	}
 	u.email = u.unconfirmedEmail
 	u.unconfirmedEmail = ""
+	return nil
 }
 
 func (u *User) RejectEmail() error {
@@ -142,20 +154,25 @@ type userCreator interface {
 	CreateUser(ctx context.Context, user *User) error
 }
 
+type deferredCreateUserValidator interface {
+	Validate(ctx context.Context, u *User) error
+}
+
 type UserUsecase struct {
 	repo userCreator
-	validator
 }
 
 func (u *UserUsecase) CreateUser(ctx context.Context, email string) error {
 	usr := NewUnconfirmedUser(email)
+
+	// Why not place this in the struct? Because the operation might be transaction-bounded.
 	v := NewDeferredCreateUserValidator(u.repo)
-	if err := v.Validate(ctx, u); err != nil {
+	if err := v.Validate(ctx, usr); err != nil {
 		return err
 	}
+
 	// Once the creation is successful, we set the unconfirmed email to confirmed.
-	usr.ConfirmEmail()
-	return nil
+	return usr.ConfirmEmail()
 }
 
 // This is another layer in between the repository and application service.
@@ -169,13 +186,22 @@ func NewDeferredCreateUserValidator(repo userCreator) *DeferredCreateUserValidat
 	return &DeferredCreateUserValidator{repo: repo}
 }
 
-// Validate validates the creation of the user with unique email - this is 
+// Validate validates the creation of the user with unique email - this is
 // because the uniqueness constraints are set by the database.
 func (v *DeferredCreateUserValidator) Validate(ctx context.Context, u *User) error {
 	if err := v.repo.CreateUser(ctx, u); err != nil {
 		// Check if the error is part of the unique constraints error.
 		// If yes, return it.
 		return u.RejectEmail()
+	}
+	return nil
+}
+
+type UserRepository struct{}
+
+func (r *UserRepository) CreateUser(ctx context.Context, user *User) error {
+	if user.unconfirmedEmail == "john.doe@mail.com" {
+		return ErrDBUniqueConstraintViolation
 	}
 	return nil
 }
