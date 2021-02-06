@@ -192,7 +192,10 @@ func (v *DeferredCreateUserValidator) Validate(ctx context.Context, u *User) err
 	if err := v.repo.CreateUser(ctx, u); err != nil {
 		// Check if the error is part of the unique constraints error.
 		// If yes, return it.
-		return u.RejectEmail()
+		if errors.Is(ErrDBUniqueConstraintViolation, err) {
+			return u.RejectEmail()
+		}
+		return err
 	}
 	return nil
 }
@@ -206,6 +209,74 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *User) error {
 	return nil
 }
 ```
+
+Similar implementation for JavaScript:
+```js
+class User {
+  #unconfirmedEmail = ''
+  #email = ''
+
+  set unconfirmedEmail(value) {
+    if (!value) {
+      throw new Error("setUnconfirmedEmailError: unconfirmed email cannot be empty")
+    }
+    this.#unconfirmedEmail = value
+  }
+
+  confirmEmail() {
+    if (!this.#unconfirmedEmail) {
+      throw new Error("no email to confirm")
+    }
+    this.#email = this.#unconfirmedEmail
+    this.#unconfirmedEmail = ''
+  }
+
+  rejectEmail() {
+    this.#unconfirmedEmail = ''
+    throw new Error('email exists')
+  }
+}
+
+class ApplicationService {
+  constructor(userRepository, userFactory) {
+    this.userRepository = userRepository
+    this.userFactory = userFactory
+  }
+
+  register(email, password) {
+    // Factory creates the user entity with unconfirmed email, as well as performing hashing of plaintext password to encrypted password.
+    const user = await this.userFactory.createUnconfirmedUserWithCredentials(email, password)
+
+    const validator = new DeferredCreateUserValidator(this.userRepository)
+    await validator.validate(user)
+
+    user.confirmEmail()
+  }
+}
+
+class DeferredCreateUserValidator {
+  constructor(userRepository) {
+    this.userRepository = userRepository
+  }
+  // validate throws exception on duplicate email.
+  async validate(user) {
+    try {
+      const newUser = await this.userRepository.create(user)
+      return newUser
+    } catch (error) {
+      // The user is responsible for throwing domain errors.
+      if (isDuplicateError(error)) {
+        user.rejectEmail()
+      }
+      throw error
+    }
+  }
+}
+```
+
+# Thoughts
+
+- why not handle them as events, `EmailRejectedEvent`?
 
 # References
 
