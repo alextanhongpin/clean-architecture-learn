@@ -25,7 +25,7 @@ How do we solve this?
 
 ## Persistence validation with visitor pattern
 
-This example may be contrived, because uniqueness constraint are defined in the database. And after validation and before the user is inserted, another concurrent user with that email might have been inserted into the database. For unique email/slug (or other unique compound constraints), what we want is _deferred validation_, that is validating the errors once it is inserted into the database. See [2]. 
+This example may be contrived, because uniqueness constraint are defined in the database. And after validation and before the user is inserted, another concurrent user with that email might have been inserted into the database. For unique email/slug (or other unique compound constraints), what we want is _deferred validation_, that is validating the errors once it is inserted into the database. See [2] and [3]. 
 
 ```go
 package main
@@ -117,3 +117,4 @@ func (u *UserUsecase) CreateUser(ctx context.Context, email, password string) er
 
 1. [Validation and DDD](https://enterprisecraftsmanship.com/posts/validation-and-ddd/)
 2. [StackOverflow: How exactly should a CQRS Command be validated and transformed to a domain object?](https://softwareengineering.stackexchange.com/questions/348337/how-exactly-should-a-cqrs-command-be-validated-and-transformed-to-a-domain-objec)
+3. [Validation in DDD and CQRS](https://www.linkedin.com/pulse/validation-ddd-cqrs-luca-briguglia)
