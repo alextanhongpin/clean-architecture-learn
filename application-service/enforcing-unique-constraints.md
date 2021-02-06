@@ -4,9 +4,16 @@ Context:
 - we want to enforce unique email upon user registration. Which layer do we handle that?
 
 Explanation:
-- For uniqueness, we cannot perform them at the domain service layer - the problem with this is the information of the unique email is only known to the database
+- For uniqueness, we cannot perform them at the domain service layer - the problem with this is the information of the unique email is only known to the database. 
+- Why not check if the email exists first? Simple, the system may not be consistent yet. Which means, we may validate that the email does not exists, but there is always a chance that the email may be inserted into the database by another concurrent request before the current one is completed. We can say that the validation is deferred until the actual user is actually inserted into the database.
+
+
+# Approach 1: Application Service throws the error
+
+- Since the domain service should not call the repository for persistence, and the entity should not know about the database error, so the logic should belong to the application service layer
 - So we will apply that constraints at the database layer, and handle the database error upon constraint violations
-- So the logic should belong to the application service layer
+- the repository throws an exception on duplicate email error, and the application service handles it. This form of delegation lies in the application service, which has an disadvantage when the same validation logic needs to be applied many times.
+- shouldn't the error be part of the entity? is there no way to enforce it?
 
 ```js
 class ApplicationService {
@@ -35,9 +42,9 @@ class ApplicationService {
 }
 ```
 
-## Update
+## Approach 2: Repository throws domain error
 
-The repository should contain the list of possible errors that will propagate out of the system, so the implementation above should be:
+The repository should contain the list of possible errors that will propagate out of the system, so the implementation above could be:
 
 ```js
 class ApplicationService {
@@ -84,6 +91,11 @@ class UserRepository {
   }
 }
 ```
+
+- However, now the details of the errors leaks to the repository layer. 
+- Also, the implementation is very database specific, and now the user have to enforce checking for the database duplicate error and propagating them to the application service
+- This example is fine, because it has only a single entry point (registration), and a single unique constraints. What if we have an entity with multiple unique constraints, and the validation logic needs to be repeated for updates? That is the main reason why business logic should be in the entity layer.
+
 # References
 
 1. [Email uniqueness as an aggregate invariant](https://enterprisecraftsmanship.com/posts/email-uniqueness-as-aggregate-invariant/)
