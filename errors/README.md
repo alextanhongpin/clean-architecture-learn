@@ -53,6 +53,7 @@ Example with golang:
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -61,12 +62,17 @@ type AggregateError struct {
 	errors map[string]string
 }
 
-func (a *AggregateError) Error() string {
+func (a AggregateError) Error() string {
 	var messages []string
 	for field, err := range a.errors {
 		messages = append(messages, fmt.Sprintf("%s: %s", field, err))
 	}
 	return strings.Join(messages, "\n")
+}
+
+func (a AggregateError) Is(err error) bool {
+	_, ok := err.(*AggregateError)
+	return ok
 }
 
 func (a *AggregateError) Add(field, msg string) {
@@ -111,7 +117,7 @@ func NewUser(email, password string) (User, error) {
 
 func main() {
 	_, err := NewUser("john.doe", "5")
-	fmt.Println(err)
+	fmt.Println(err, errors.Is(&AggregateError{}, err))
 }
 ```
 
