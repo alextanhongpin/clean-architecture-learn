@@ -2,7 +2,28 @@
 Learnings from clean architecture
 
 
-## Find, validate, persist pattern
+Domain layer
+- Domain events
+- Entities
+- Services
+- Repositories
+- Value objects
+- Aggregates
+
+Application layer
+- Application service, transaction happens here
+- Repositories
+- Message brokers, adapters
+- Workers
+- Authorization
+
+Outermost
+- controllers
+- Authentication 
+- Serialiser, logging, tracing metrics
+
+
+## Find, execute, commit pattern
 ```js
 // ApplicationService are also known as usecase layer. They do not contain business logic.
 class ApplicationService {
