@@ -35,6 +35,55 @@ class ApplicationService {
 }
 ```
 
+## Update
+
+The repository should contain the list of possible errors that will propagate out of the system, so the implementation above should be:
+
+```js
+class ApplicationService {
+  constructor(userRepository, userFactory) {
+    this.userRepository = userRepository
+    this.userFactory = userFactory
+  }
+
+  // Enforcing unique email?
+  register(email, password) {
+    // Build the user entity, performs hashing of plaintext password to encrypted password.
+    const user = await this.userFactory.createWithCredentials(email, password)
+
+    // The userRepository is now responsible for propagating domain errors.
+    const newUser = await this.userRepository.create(user)
+    return newUser
+  }
+}
+
+class UserRepository {
+  constructor(db) {
+    this.db = db
+  }
+
+  async create({
+    name,
+    email,
+    encryptedPassword
+  }) {
+    try {
+      const user = await this.db.insert({
+        name,
+        email,
+        encryptedPassword
+      })
+      return user
+    } catch (error) {
+      if (isDuplicateError(error)) {
+        throw new ErrEmailNotUnique('email exists')
+      }
+      // Do not propagate database errors, replace with other domain errors instead (below is a poor choice).
+      throw new ErrInternalServerError('internal server error')
+    }
+  }
+}
+```
 # References
 
 1. [Email uniqueness as an aggregate invariant](https://enterprisecraftsmanship.com/posts/email-uniqueness-as-aggregate-invariant/)
