@@ -1,5 +1,6 @@
 # Domain service
 
+- See [2], this provides a lot of info about domain service.
 - part of domain layer
 - operates on aggregates
 - contains business logic such as validation
@@ -12,3 +13,4 @@
 # Reference
 
 1. [StackOverflow: Can Domain Services access Repositories?](https://stackoverflow.com/questions/26930131/can-domain-services-access-repositories)
+2. [Domain Driven Design- Tactical Patterns](http://domaindrivendesigns.blogspot.com/2018/11/domain-services-domain-model-domain.html?m=0)
