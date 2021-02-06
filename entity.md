@@ -1,5 +1,6 @@
 # Entity
 
+- Typically modelled from the database table
 - Entity is just dto between repository and app, so it should not bubble up the whole layer.
 - Entity does not have business logic.
 - Entity should contain the primary business logic
