@@ -92,7 +92,7 @@ Bad:
 - the repository is performing a business logic
 - errors are not obvious
 
-```sql
+```js
 class ApplicationService {
   constructor(userRepository, userService) {
     this.userRepository = userRepository
