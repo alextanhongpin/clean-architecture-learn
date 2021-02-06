@@ -19,6 +19,28 @@ So what can be infer from this?
 - There are other example queries, especially those dealing with a collection of entities, or the aggregated result (e.g., `findRegisteredUserCountsSinceDate`, `findUsersThatRegisteredAfter` etc)
 
 
+# With Conditionals/enums
+
+The idea is just to keep the public interface layer small, by exposing as little operations as possible. This however will introduce conditionals in a repository, which itself could be a bad idea.
+```js
+const UserFields = {
+  ID: 'id',
+  EMAIL: 'email',
+  CONFIRMATION_EMAIL_TOKEN: 'confirmation_email_token',
+  RESET_PASSWORD_TOKEN: 'reset_password_token'
+}
+
+class UserRepository {
+  findUser(value, key = UserFields.ID) {}
+}
+
+// Usage:
+userRepository.find(id) // Defaults to findByID
+userRepository.find(email, UserFields.EMAIL)
+userRepository.find(email, UserFields.CONFIRMATION_EMAIL_TOKEN)
+```
+
+# With Specification Pattern
 Can we simplify it to `findUser(UserSpecification)`?
 
 
