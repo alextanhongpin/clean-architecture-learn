@@ -96,6 +96,91 @@ class UserRepository {
 - Also, the implementation is very database specific, and now the user have to enforce checking for the database duplicate error and propagating them to the application service
 - This example is fine, because it has only a single entry point (registration), and a single unique constraints. What if we have an entity with multiple unique constraints, and the validation logic needs to be repeated for updates? That is the main reason why business logic should be in the entity layer.
 
+## Approach 3: Deferred validation
+
+Think of it as an `after` hook. This is important, because the repo in the hooks are bounded by the same transaction.
+```go
+package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+)
+
+var ErrEmailExists = errors.New("email exists")
+
+func main() {
+	fmt.Println("Hello, playground")
+}
+
+// Entity.
+type User struct {
+	email            string // Can't set before creation! That's violating the domain rule.
+	unconfirmedEmail string // Use this instead.
+}
+
+func NewUnconfirmedUser(email string) *User {
+	return &User{
+		unconfirmedEmail: email,
+	}
+}
+
+func (u *User) ConfirmEmail() {
+	u.email = u.unconfirmedEmail
+	u.unconfirmedEmail = ""
+}
+
+func (u *User) RejectEmail() error {
+	u.unconfirmedEmail = ""
+	return ErrEmailExists
+}
+
+// Application Service
+
+type userCreator interface {
+	CreateUser(ctx context.Context, user *User) error
+}
+
+type UserUsecase struct {
+	repo userCreator
+	validator
+}
+
+func (u *UserUsecase) CreateUser(ctx context.Context, email string) error {
+	usr := NewUnconfirmedUser(email)
+	v := NewDeferredCreateUserValidator(u.repo)
+	if err := v.Validate(ctx, u); err != nil {
+		return err
+	}
+	// Once the creation is successful, we set the unconfirmed email to confirmed.
+	usr.ConfirmEmail()
+	return nil
+}
+
+// This is another layer in between the repository and application service.
+// Unlike domain services, this can be stateful, but more of a decorator to the existing repository.
+// You can think of it as an "after" hook too.
+type DeferredCreateUserValidator struct {
+	repo userCreator
+}
+
+func NewDeferredCreateUserValidator(repo userCreator) *DeferredCreateUserValidator {
+	return &DeferredCreateUserValidator{repo: repo}
+}
+
+// Validate validates the creation of the user with unique email - this is 
+// because the uniqueness constraints are set by the database.
+func (v *DeferredCreateUserValidator) Validate(ctx context.Context, u *User) error {
+	if err := v.repo.CreateUser(ctx, u); err != nil {
+		// Check if the error is part of the unique constraints error.
+		// If yes, return it.
+		return u.RejectEmail()
+	}
+	return nil
+}
+```
+
 # References
 
 1. [Email uniqueness as an aggregate invariant](https://enterprisecraftsmanship.com/posts/email-uniqueness-as-aggregate-invariant/)
