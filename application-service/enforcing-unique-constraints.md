@@ -42,7 +42,7 @@ class ApplicationService {
 }
 ```
 
-## Approach 2: Repository throws domain error
+## Approach 2: Repository throws domain error (Preferred)
 
 The repository should contain the list of possible errors that will propagate out of the system, so the implementation above could be:
 
@@ -83,18 +83,19 @@ class UserRepository {
       return user
     } catch (error) {
       if (isDuplicateError(error)) {
-        throw new ErrEmailNotUnique('email exists')
+        // throw new ErrEmailNotUnique('email exists')
+	user.rejectEmail()
       }
-      // Do not propagate database errors, replace with other domain errors instead (below is a poor choice).
-      throw new ErrInternalServerError('internal server error')
+      throw error
     }
   }
 }
 ```
 
-- However, now the details of the errors leaks to the repository layer. 
-- Also, the implementation is very database specific, and now the user have to enforce checking for the database duplicate error and propagating them to the application service
-- This example is fine, because it has only a single entry point (registration), and a single unique constraints. What if we have an entity with multiple unique constraints, and the validation logic needs to be repeated for updates? That is the main reason why business logic should be in the entity layer.
+- However, now the details of the errors leaks to the repository layer. Not true, let the entity throw error.
+- Also, the implementation is very database specific, and now the user have to enforce checking for the database duplicate error and propagating them to the application service. Update: its fine, it is better than leaking the database internals up to application service - it means no swapping db.
+- This example is fine, because it has only a single entry point (registration), and a single unique constraints. What if we have an entity with multiple unique constraints, and the validation logic needs to be repeated for updates? That is the main reason why business logic should be in the entity layer. Update: yes, let the entity throw the error,
+- In a way, this is actually the preffered method. it has less complexity. entity cannot call repository, but the opposite holds true. Also, the errors could be domain errors, if we handle the db specific errors at the application layer, we are already losing the possibility to swap database. 
 
 ## Approach 3: Deferred validation
 
@@ -273,6 +274,8 @@ class DeferredCreateUserValidator {
   }
 }
 ```
+
+This is unnecessary complexity.
 
 # Thoughts
 
