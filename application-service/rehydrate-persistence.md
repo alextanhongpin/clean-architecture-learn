@@ -2,8 +2,10 @@
 
 As mentioned in `persistence-validation`, we learn to distinguish between persistence validation, and local entity validation. For persistence validation, the entity rule belongs to the repository, since the repository knows about the entity aggregates. The example below demonstrates how to validate the logic, and coupling them to the entity:
 
-
+- we want to find a user with valid confirmation token, and confirm the email
+- we initialize a blank user, and attempt to confirm the token
 - find the user with a valid confirmation token (persistence validation)
+- the user state is then rehydated
 - validate the token has not yet expired (local validation)
 
 ```go
