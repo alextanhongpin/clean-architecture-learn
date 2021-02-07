@@ -112,10 +112,13 @@ import (
 const minPasswordLength = 8
 
 var (
-	// Error.
-	ErrInvalidEmail = errors.New("user: invalid email")
+	// Domain Error.
+	ErrUser = errors.New("user")
+	
+	// Field error.
+	ErrInvalidEmail = errors.New("%w: invalid email", ErrUser)
 
-	// Suberrors.
+	// Field suberrors.
 	ErrEmailRequired    = fmt.Errorf("%w: cannot be empty", ErrInvalidEmail)
 	ErrEmailWrongFormat = fmt.Errorf("%w: wrong format", ErrInvalidEmail)
 
@@ -160,6 +163,13 @@ func (a *AggregateError) HasErrors() bool {
 	return len(a.errors) > 0
 }
 
+func (a *AggregateError) Err() error {
+	if a.HasErrors() {
+	        return err
+        }
+	return nil
+}
+
 func NewAggregateError() *AggregateError {
 	return &AggregateError{}
 }
@@ -181,12 +191,8 @@ func validateEmail(email string) error {
 	} else if !strings.Contains(email, "@") {
 		err.Add(ErrEmailWrongFormat)
 	}
-
-	if err.HasErrors() {
-		return err
-	}
-
-	return nil
+	
+	return err.Err()
 }
 
 func validatePassword(password string) error {
@@ -198,24 +204,16 @@ func validatePassword(password string) error {
 		err.Add(ErrPasswordTooShort)
 	}
 
-	if err.HasErrors() {
-		return err
-	}
-
-	return nil
+	return err.Err()
 }
 
 func NewUser(email, password string) (User, error) {
 	err := NewAggregateError()
 	err.Add(validateEmail(email), validatePassword(password))
-	if err.HasErrors() {
-		return User{}, err
-	}
-
 	return User{
 		Email:             email,
 		EncryptedPassword: encrypt(password),
-	}, nil
+	}, err.Err()
 }
 
 func main() {
