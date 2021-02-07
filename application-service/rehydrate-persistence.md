@@ -8,6 +8,9 @@ As mentioned in `persistence-validation`, we learn to distinguish between persis
 - the user state is then rehydated
 - validate the token has not yet expired (local validation)
 
+Improvement:
+- the current persistence validator accepts a User pointer. Should we be more specific in what fields it should validate? Would it lead to an explosion of interfaces?
+
 ```go
 package main
 
