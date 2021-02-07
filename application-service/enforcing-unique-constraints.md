@@ -97,6 +97,101 @@ class UserRepository {
 - This example is fine, because it has only a single entry point (registration), and a single unique constraints. What if we have an entity with multiple unique constraints, and the validation logic needs to be repeated for updates? That is the main reason why business logic should be in the entity layer. Update: yes, let the entity throw the error,
 - In a way, this is actually the preffered method. it has less complexity. entity cannot call repository, but the opposite holds true. Also, the errors could be domain errors, if we handle the db specific errors at the application layer, we are already losing the possibility to swap database. 
 
+Improvement to 2) by enforcing the repository to call either one of the entity's method upon success/failure:
+
+```go
+package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+)
+
+var (
+	ErrEmailExists              = errors.New("email exists")
+	ErrUnconfirmedEmailRequired = errors.New("unconfirmed email is required")
+)
+
+func main() {
+	repo := new(UserRepository)
+	usecase := &UserUsecase{repo: repo}
+	fmt.Println(usecase.CreateUser(context.Background(), "john.doe@mail.com"))
+	fmt.Println(usecase.CreateUser(context.Background(), "john"))
+}
+
+// Entity.
+type User struct {
+	email            string // Can't set before creation! That's violating the domain rule.
+	unconfirmedEmail string // Use this instead.
+}
+
+func (u *User) PlaceEmail(email string) error {
+	if u.email != "" {
+		return ErrEmailExists
+	}
+	u.unconfirmedEmail = email
+	return nil
+}
+
+func (u *User) RejectEmail() error {
+	u.unconfirmedEmail = ""
+	return ErrEmailExists
+}
+
+// ConfirmEmailPlacement verifies that the email has been claimed upon successful creation.
+func (u *User) ConfirmEmailPlacement() error {
+	if u.unconfirmedEmail == "" {
+		return ErrUnconfirmedEmailRequired
+	}
+	u.email = u.unconfirmedEmail
+	u.unconfirmedEmail = ""
+	return nil
+}
+
+// Application Service
+type userCreationService interface {
+	ConfirmEmailPlacement() error
+	RejectEmail() error
+}
+
+type userCreator interface {
+	CreateUser(ctx context.Context, user userCreationService) error
+}
+
+type UserUsecase struct {
+	repo userCreator
+}
+
+func (u *UserUsecase) CreateUser(ctx context.Context, email string) error {
+	usr := new(User)
+	if err := usr.PlaceEmail(email); err != nil {
+		return err
+	}
+
+	if err := u.repo.CreateUser(ctx, usr); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+
+type UserRepository struct{}
+
+func (r *UserRepository) CreateUser(ctx context.Context, u userCreationService) error {
+	user, ok := u.(*User)
+	if !ok {
+		return errors.New("invalid user")
+	}
+	if user.unconfirmedEmail == "john.doe@mail.com" {
+		return user.RejectEmail()
+	}
+	return user.ConfirmEmailPlacement()
+}
+```
+
 ## Approach 3: Deferred validation
 
 Think of it as an `after` hook. This is important, because the repo in the hooks are bounded by the same transaction.
