@@ -277,6 +277,162 @@ class DeferredCreateUserValidator {
 
 This is unnecessary complexity.
 
+Improvement by ensuring the `confirmEmail` or `rejectEmail` is called:
+
+```go
+type confirmUserCreation interface {
+	RejectEmail() error
+	ConfirmEmail() error
+}
+
+// Validate validates the creation of the user with unique email - this is
+// because the uniqueness constraints are set by the database.
+func (v *DeferredCreateUserValidator) Validate(ctx context.Context, u confirmUserCreation) error {
+	user, ok := u.(*User)
+	if !ok {
+		return errors.New("invalid user")
+	}
+	if err := v.repo.CreateUser(ctx, user); err != nil {
+		// Check if the error is part of the unique constraints error.
+		// If yes, return it.
+		if errors.Is(ErrDBUniqueConstraintViolation, err) {
+			return u.RejectEmail()
+		}
+		return err
+	}
+	return u.ConfirmEmail()
+}
+```
+
+Using `visitor` to enforce the entity to perform the validation:
+```go
+package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+)
+
+var (
+	ErrEmailExists              = errors.New("email exists")
+	ErrUnconfirmedEmailRequired = errors.New("unconfirmed email is required")
+
+	ErrDBUniqueConstraintViolation = errors.New("unique violation: email")
+)
+
+func main() {
+	repo := new(UserRepository)
+	usecase := &UserUsecase{repo: repo}
+	fmt.Println(usecase.CreateUser(context.Background(), "john.doe@mail.com"))
+	fmt.Println(usecase.CreateUser(context.Background(), "john"))
+}
+
+// Entity.
+type User struct {
+	email            string // Can't set before creation! That's violating the domain rule.
+	unconfirmedEmail string // Use this instead.
+}
+
+type userCreationValidator interface {
+	Validate(ctx context.Context, u *User) error
+}
+
+func (u *User) PlaceEmail(email string) error {
+	if u.email != "" {
+		return ErrEmailExists
+	}
+	u.unconfirmedEmail = email
+	return nil
+}
+
+func (u *User) RejectEmail() error {
+	u.unconfirmedEmail = ""
+	return ErrEmailExists
+}
+
+// ConfirmEmailPlacement verifies that the email has been claimed upon successful creation.
+func (u *User) ConfirmEmailPlacement(ctx context.Context, v userCreationValidator) error {
+	if err := v.Validate(ctx, u); err != nil {
+		// Just to ensure the contract is fulfilled.
+		if errors.Is(ErrEmailExists, err) {
+			// This would be called in the validator too.
+			return u.RejectEmail()
+		}
+		return err
+	}
+
+	if u.unconfirmedEmail == "" {
+		return ErrUnconfirmedEmailRequired
+	}
+	u.email = u.unconfirmedEmail
+	u.unconfirmedEmail = ""
+	return nil
+}
+
+// Application Service
+
+type userCreator interface {
+	CreateUser(ctx context.Context, user *User) error
+}
+
+type deferredCreateUserValidator interface {
+	Validate(ctx context.Context, u *User) error
+}
+
+type UserUsecase struct {
+	repo userCreator
+}
+
+func (u *UserUsecase) CreateUser(ctx context.Context, email string) error {
+	usr := new(User)
+	if err := usr.PlaceEmail(email); err != nil {
+		return err
+	}
+
+	// Why not place this in the struct? Because the operation might be transaction-bounded.
+	v := NewDeferredCreateUserValidator(u.repo)
+	if err := usr.ConfirmEmailPlacement(ctx, v); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// This is another layer in between the repository and application service.
+// Unlike domain services, this can be stateful, but more of a decorator to the existing repository.
+// You can think of it as an "after" hook too.
+type DeferredCreateUserValidator struct {
+	repo userCreator
+}
+
+func NewDeferredCreateUserValidator(repo userCreator) *DeferredCreateUserValidator {
+	return &DeferredCreateUserValidator{repo: repo}
+}
+
+// Validate validates the creation of the user with unique email - this is
+// because the uniqueness constraints are set by the database.
+func (v *DeferredCreateUserValidator) Validate(ctx context.Context, u *User) error {
+	err := v.repo.CreateUser(ctx, u)
+
+	// Check if the error is part of the unique constraints error.
+	// If yes, return it.
+	if errors.Is(ErrDBUniqueConstraintViolation, err) {
+		return u.RejectEmail()
+	}
+	return err
+}
+
+type UserRepository struct{}
+
+func (r *UserRepository) CreateUser(ctx context.Context, user *User) error {
+	if user.unconfirmedEmail == "john.doe@mail.com" {
+		return ErrDBUniqueConstraintViolation
+	}
+	return nil
+}
+```
+
 # Thoughts
 
 - why not handle them as events, `EmailRejectedEvent`?
