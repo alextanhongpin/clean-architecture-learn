@@ -51,3 +51,7 @@ class ApplicationService {
   }
 }
 ```
+
+## References
+
+1. [StackOverflow: UseCase-Drive vs Domain-Driven](https://stackoverflow.com/questions/3173070/design-methodology-use-case-driven-vs-domain-driven)
