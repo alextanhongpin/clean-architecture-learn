@@ -8,6 +8,7 @@
 - may call repository, but should be avoided. Instead, query the entity though _repository_ at the _application service_ layer, and pass the entity to the `domain service`. See [1]
 - does not deal with persistence
 - often misunderstood with _application service_ layer
+- since the _application service_ shouldn't house business logic, if there is a logic that requires access to repository, then the best place is to put it in _domain service_. Ideally _domain service_ should not call repository. If possible, fetch all related entities (or aggregates) in the _application service_, then pass them to the _domain service_ to execute the business logic.
 
 
 # Reference
