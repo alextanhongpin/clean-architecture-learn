@@ -14,6 +14,38 @@
 - Knowing this, you may realize that your Business Layer really is a Service Layer as well. At some point, the point from which you're asking this question being one such point, the distinction is mostly semantic.
 - deals with calling repository to persist an entity/aggregate
 
+
+## Example of Application Service
+
+Find, execute, commit pattern:
+```js
+// ApplicationService are also known as usecase layer. They do not contain business logic.
+class ApplicationService {
+  constructor(userRepository, userService) {
+    this.userRepository = userRepository
+    this.userService = userService
+  }
+  
+  // Usecase to request confirmation email.
+  async requestConfirmationEmail(email) {
+    // 1. Repository: Find entity.
+    const user = await this.userRepository.find(email)
+    
+    // 2. Domain service: Execute business logic.
+    await this.userService.validateNotYetConfirmed(user) // Throws on error.
+    
+    // 3. Domain service: Update state of entity in-memory.
+    const userWithConfirmationToken = await this.userService.createConfirmationToken(user)
+    
+    // 4. Repository: Persist entity state.
+    const token = await this.userRepository.updateConfirmationToken(user)
+    
+    // Application service should not return entity. Either define a custom DTO, or return primitives.
+    return token
+  }
+}
+```
+
 # References
 
 1. [StackOverflow: Domain Service, Application Service](https://stackoverflow.com/questions/2268699/domain-driven-design-domain-service-application-service)
