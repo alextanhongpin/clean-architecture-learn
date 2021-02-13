@@ -5,22 +5,28 @@ How do we structure our application to use clean architecture? It really depends
 Four main folders:
 ```
 your-domain
-|- ui # Primary adapter lies here. 
+|- http # Primary adapter (aka inputs) lies here. 
 |  |- api
 |  |  |- root/
 |  |  |- v1/
 |  |  |- v2/
-|  |  `- api.go
+|  |  `- api.go # Maps domain entity to external in/out DTOs
+|  |- error # Maps domain errors to client errors, e.g, http errors
 |  |- middleware
-|  |- security # contains authorization logic (authorization header extraction, jwt signing and validating)
+|  |- security # contains authorization logic (authorization header extraction, jwt signing and validating, NOTE: jwt implementation is not part of infra)
 |  `- session # contains propagation context, but only within ui layer.
 |
-|- infra # Secondary adapter lies here.
-|  |- postgres
-|  |  |- migration/
-|  |  |- seed/
+|- graph/ # You can also have multiple primary adapters (websocket, graphql, grpc, rpc, cli)
+|- cli/
+|
+|- infra # Secondary adapter (aka outputs) lies here.
+|  |- postgres # Postgres port (port is the interface, adapter is the implementation)
+|  |  |- migration/ # Adapters
+|  |  |- seed/ 
 |  |  `- repository/ # Repository implementation may lie here, or in the application service.
-|  |- redis.go
+|  |- validator.go
+|  |- logger.go
+|  |- redis.go # Redis port/adapter
 |  `- kafka.go
 |
 |- domain # This layer does not depend on any external layer.
@@ -36,11 +42,11 @@ your-domain
 |  `- event
 |
 `- app # Application services lies here. Group by subdomain. They can depend on infra + domain layer.
-   |- adapter/
-   |  |- repository/ # Another option to place repository implementation.
-   |  |- error/ # Maps domain errors to client errors, e.g, http errors
-   |  |- dto/ # Maps domain entity to external in/out DTOs
-   |  `- translations/ 
-   |- usecase/
-   `- another usercase
+   |- authentication
+   |  |- register.go
+   |  |- reset_password.go
+   |  |- ...
+   |  `- login.go
+   |- authentication.go # Facade to individual authentication usecases. This is meant as a "stable" layer, a contract that doesn't change. The implementation may change.
+   `- another usercase/
 ```
