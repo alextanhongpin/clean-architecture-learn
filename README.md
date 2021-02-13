@@ -22,36 +22,13 @@ Outermost
 - Authentication 
 - Serialiser, logging, tracing metrics
 
+# Good practices
 
-## Find, execute, commit pattern
-```js
-// ApplicationService are also known as usecase layer. They do not contain business logic.
-class ApplicationService {
-  constructor(userRepository, userService) {
-    this.userRepository = userRepository
-    this.userService = userService
-  }
-  
-  // Usecase to request confirmation email.
-  async requestConfirmationEmail(email) {
-    // 1. Repository: Find entity.
-    const user = await this.userRepository.find(email)
-    
-    // 2. Domain service: Execute business logic.
-    await this.userService.validateNotYetConfirmed(user) // Throws on error.
-    
-    // 3. Domain service: Update state of entity in-memory.
-    const userWithConfirmationToken = await this.userService.createConfirmationToken(user)
-    
-    // 4. Repository: Persist entity state.
-    const token = await this.userRepository.updateConfirmationToken(user)
-    
-    // Application service should not return entity. Either define a custom DTO, or return primitives.
-    return token
-  }
-}
-```
+- DDD implementation should not be influenced by persistence and database
+- avoid anaemic domain model, domain classes full of getters and setters, void of behaviours.
+- not all logic are domain logic, e.g. field validations
+- security (e.g. authentication) is not part of the core domain (it could be a generic/supporting domain), however, most of the time, the implementation can lie in the `ui`/`application service` layer, out of the domain model.
 
-## References
+# References
 
 1. [StackOverflow: UseCase-Drive vs Domain-Driven](https://stackoverflow.com/questions/3173070/design-methodology-use-case-driven-vs-domain-driven)
