@@ -19,7 +19,7 @@ your-domain
 |  |- postgres
 |  |  |- migration/
 |  |  |- seed/
-|  |  `- repository/ # Repository implementation lies here.
+|  |  `- repository/ # Repository implementation may lie here, or in the application service.
 |  |- redis.go
 |  `- kafka.go
 |
@@ -36,6 +36,11 @@ your-domain
 |  `- event
 |
 `- app # Application services lies here. Group by subdomain. They can depend on infra + domain layer.
-   |- usecase
+   |- adapter/
+   |  |- repository/ # Another option to place repository implementation.
+   |  |- error/ # Maps domain errors to client errors, e.g, http errors
+   |  |- dto/ # Maps domain entity to external in/out DTOs
+   |  `- translations/ 
+   |- usecase/
    `- another usercase
 ```
