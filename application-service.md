@@ -13,6 +13,25 @@
 - The Service Layer is usually constructed in terms of discrete operations that have to be supported for a client. See [4]
 - Knowing this, you may realize that your Business Layer really is a Service Layer as well. At some point, the point from which you're asking this question being one such point, the distinction is mostly semantic.
 - deals with calling repository to persist an entity/aggregate
+- the place where dependencies are resolved
+- interface to your domain - used by external consumers to talk to your system
+- all logic concerning application workflow lies here
+- it’s method is a use case, single flow
+- handles the flow of usecases, including any additional concerns needed on top of the domains
+- should generally have simple flow, complex application service flow indicates that domain logic has leaked out the domain
+- coordinates application flow and infrastructure, but do not execute business logic rules or invariants
+- it is common to see calls to repositories, unit of works (database transactions), message bus, cache
+- initialize and oversees interaction between the domain objects and services
+    - get domain object(s) from repository/check object exists
+    - execute an action
+    - put them back in repository/or not
+- sits above domain model and coordinates application activity
+- does not contain business logic, does not hold state for any entities (however it can store the state of a business workflow transaction)
+- validate and save entity only in application service through repository
+- performs applicative level logic as user interaction, input validation, logic not related to business but to other concerns (authentication, security, emailing)
+- accepts and returns service contract objects or request/response objects
+- does not accept or return domain entities or value objects
+
 
 
 ## Example of Application Service
