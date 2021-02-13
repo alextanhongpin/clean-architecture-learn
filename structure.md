@@ -21,9 +21,13 @@ your-domain
 |
 |- infra # Secondary adapter (aka outputs) lies here.
 |  |- postgres # Postgres port (port is the interface, adapter is the implementation)
+|  |  |- repository/ # Repository implementation may lie here, or in the application service.
 |  |  |- migration/ # Adapters
 |  |  |- seed/ 
-|  |  `- repository/ # Repository implementation may lie here, or in the application service.
+|  |  `- postgres.go
+|  |- oauth/
+|  |- mailer/
+|  |- payment/ # The domain services should depend on the interface.
 |  |- validator.go
 |  |- logger.go
 |  |- redis.go # Redis port/adapter
