@@ -45,7 +45,7 @@ your-domain
 |  |- value # Value objects
 |  `- event
 |
-`- app # Application services lies here. Group by subdomain. They can depend on infra + domain layer.
+`- usecase # Application services lies here. Group by subdomain. They can depend on infra + domain layer. Other name can be app, core etc.
    |- authentication
    |  |- register.go
    |  |- reset_password.go
@@ -53,5 +53,7 @@ your-domain
    |  `- login.go
    |- authentication.go # Facade to individual authentication usecases. This is meant as a "stable" layer, a contract that doesn't change. The implementation may change.
    |- another_usercase/
-   `- another_usecase.go
+   |- another_usecase.go
+   `- contract (or types/model/domain) adapter
+      `- user_descriptor.go # In some cases where the inner layer and outer layer needs to share a common model, this is the place to put Request/response or DTO object.
 ```
