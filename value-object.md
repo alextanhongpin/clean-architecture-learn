@@ -2,7 +2,7 @@
 
 Primitive obsession is an anti-pattern, and value objects are highly recommended. However, some languages does not offer the required functionality to create a value object in its valid state.
 
-Take for example `golang`:
+Take for example `golang`, modelling __value object__ through type definition is suboptimal:
 
 ```go
 package main
