@@ -5,7 +5,7 @@ How do we structure our application to use clean architecture? It really depends
 Four main folders:
 ```
 your-domain
-|- reset # Primary adapter (aka inputs) lies here. 
+|- rest # Primary adapter (aka inputs) for REST API lies here. 
 |  |- api
 |  |  |- root/
 |  |  |- v1/
@@ -16,7 +16,7 @@ your-domain
 |  |- security # contains authorization logic (authorization header extraction, jwt signing and validating, NOTE: jwt implementation is not part of infra)
 |  `- session # contains propagation context, but only within ui layer.
 |
-|- graph/ # You can also have multiple primary adapters (websocket, graphql, grpc, rpc, cli)
+|- graph/ # You can also have multiple primary adapters (aside from rest, websocket, graphql, grpc, rpc, cli)
 |- cli/
 |
 |- infra # Secondary adapter (aka outputs) lies here.
@@ -52,5 +52,6 @@ your-domain
    |  |- ...
    |  `- login.go
    |- authentication.go # Facade to individual authentication usecases. This is meant as a "stable" layer, a contract that doesn't change. The implementation may change.
-   `- another usercase/
+   |- another_usercase/
+   `- another_usecase.go
 ```
