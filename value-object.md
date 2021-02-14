@@ -1,6 +1,15 @@
 # Value Object
 
+
 Primitive obsession is an anti-pattern, and value objects are highly recommended. However, some languages does not offer the required functionality to create a value object in its valid state.
+
+- are DTOs value object? No, see [1]. DTO is a class representing some data with no logic in it.
+- Value Object is a full member of your domain model
+- The only difference between Value Object and Entity is that Value Object doesn’t have its own identity.
+- Value Object are `comparable` by values
+- Value Objects do contain logic and, typically, they are not used for transferring data between application boundaries.
+
+# Example
 
 Take for example `golang`, modelling __value object__ through type definition is suboptimal:
 
@@ -115,3 +124,7 @@ func main() {
 	fmt.Println(p)
 }
 ```
+
+# References
+
+1. [DTO vs Value Object vs POCO](https://enterprisecraftsmanship.com/posts/dto-vs-value-object-vs-poco/#:~:text=DTO%20is%20a%20class%20representing%20some%20data%20with%20no%20logic%20in%20it.&text=On%20the%20other%20hand%2C%20Value,t%20have%20its%20own%20identity.)
