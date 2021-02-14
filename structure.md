@@ -5,7 +5,7 @@ How do we structure our application to use clean architecture? It really depends
 Four main folders:
 ```
 your-domain
-|- http # Primary adapter (aka inputs) lies here. 
+|- reset # Primary adapter (aka inputs) lies here. 
 |  |- api
 |  |  |- root/
 |  |  |- v1/
@@ -28,7 +28,7 @@ your-domain
 |  |- oauth/
 |  |- mailer/
 |  |- payment/ # The domain services should depend on the interface.
-|  |- validator.go
+|  |- validator.go # For input validation in application service, as opposed to domain errors.
 |  |- logger.go
 |  |- redis.go # Redis port/adapter
 |  `- kafka.go
