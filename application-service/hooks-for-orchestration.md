@@ -1,5 +1,7 @@
 # Using hooks for orchestration
 
+Update: This is totally not required. The repository + unit of work pattern is sufficient to handle most of the cases.
+
 ```go
 package main
 
