@@ -10,6 +10,8 @@
 - While not a must, entity's fields are usually private, and may only be modified through setters/factories/constructors to ensure they are set to valid states
 - instead of setter for individual fields, use setters for a group of fields to validate them as a business logic, `changePersonalDetails` (name, age etc) instead of setters for each.
 - entity return errors
+- does not perform IO
+- does not call third part libs, define interface and leave the implementation as infrastructure level and call them at domain service/application service/repository, whichever makes sense
 
 
 
