@@ -29,8 +29,8 @@
 - does not contain business logic, does not hold state for any entities (however it can store the state of a business workflow transaction)
 - validate and save entity only in application service through repository
 - performs applicative level logic as user interaction, input validation, logic not related to business but to other concerns (authentication, security, emailing)
-- accepts and returns service contract objects or request/response objects
-- does not accept or return domain entities or value objects
+- accepts and returns service contract objects or request/response objects, e.g. dto. So if the domain has a _User_ entity, then a simplified _UserDto_ can be returned. The adapter/transformer/converter to convert between entity and dto can lie in the application service layer.
+- does not accept or return domain entities or value objects. The reason for this is that we do not want to expose the domain models in the outer layer. Any operations by the entity can only happen in the application service and the layers below. The output should be immutable, and that is why DTO is often recommended as the toutput value. Some people design application services as command handlers, which does not return anything, which makes me wonder how the testing is done.
 
 
 
@@ -71,3 +71,4 @@ class ApplicationService {
 2. [Design of Service Layer and Application Logic](https://emacsway.github.io/en/service-layer/)
 3. [Framework Design Guidelines: Domain Logic Patterns](https://www.informit.com/articles/article.aspx?p=1398617&seqNum=4)
 4. [StackOverflow: Service Layer vs Business Layer in architecting web applications?](https://stackoverflow.com/questions/4108824/service-layer-vs-business-layer-in-architecting-web-applications#:~:text=The%20Service%20Layer%20is%20usually,objects%20to%20be%20persisted%2C%20etc.)
+5. [Application Services - 10 common doubts answered](https://blog.arkency.com/application-service-ruby-rails-ddd/)
