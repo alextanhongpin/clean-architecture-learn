@@ -31,7 +31,7 @@
 - performs applicative level logic as user interaction, input validation, logic not related to business but to other concerns (authentication, security, emailing)
 - accepts and returns service contract objects or request/response objects, e.g. dto. So if the domain has a _User_ entity, then a simplified _UserDto_ can be returned. The adapter/transformer/converter to convert between entity and dto can lie in the application service layer.
 - does not accept or return domain entities or value objects. The reason for this is that we do not want to expose the domain models in the outer layer. Any operations by the entity can only happen in the application service and the layers below. The output should be immutable, and that is why DTO is often recommended as the toutput value. Some people design application services as command handlers, which does not return anything, which makes me wonder how the testing is done.
-
+- can an application service update multiple entity at the same time? Only if they belong to the same aggregate root. What if we need to update an unrelated entity? We do so by publishing an event.
 
 
 ## Example of Application Service
