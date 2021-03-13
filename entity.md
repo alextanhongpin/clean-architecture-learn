@@ -27,6 +27,24 @@ For example:
 
 In any of the cases above, the entity is limited by the fact that it should not have access to the repository layer. If the domain service cannot access repository too, then the only possible layer to place this logic is in the application service itself.
 
+## Design thoughts
+
+There are several options for constructor, but ideally we want one that can scale with growing fields.
+
+- constructors can evolve to mega constructor
+- constructors should have minimal required fields
+- use required constructor field + functional optional for handling default args
+
+- entity can have getters
+- entity getters should be immutable (for list, make a copy first)
+- entity should not have individual setters field, we usually modify a set of value objects (e.g. updateUserDetail, updateAddress vs setName, setAge)
+- entity should not be modifiable outside the domain
+- unrestrictive setters makes it easy to violate domain rules, set a group of value objects and always check for invariants
+- entity should be constructed in it's valid state
+- separate construction by using builder pattern
+- on build for builder pattern, pass in a validator to validate for different constructor args
+- group related entity fields as value objects, e.g. Address, Confirmable
+
 ## References
 
 1. [StackOverflow: Validation in Domain Model of Domain Service](https://stackoverflow.com/questions/35934713/validation-in-domain-model-of-domain-service)
