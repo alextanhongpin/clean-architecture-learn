@@ -1,5 +1,13 @@
 # Fluent Builder Pattern
 
+Why not just use a constructor?
+- entities attributes can grow
+- order in constructor is important
+
+Why separate builder from entity?
+- entity should have mostly read only fields
+- setters should have invariants, but normally when loading from db, they can be empty first
+
 ```go
 package main
 
