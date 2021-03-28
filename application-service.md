@@ -65,6 +65,13 @@ class ApplicationService {
 }
 ```
 
+## Event sourcing where to place event handler
+
+https://softwareengineering.stackexchange.com/questions/325996/ddd-where-to-place-domain-event-handlers
+
+https://softwareengineering.stackexchange.com/questions/168481/how-to-choose-between-using-a-domain-event-or-letting-the-application-layer-orc
+
+
 # References
 
 1. [StackOverflow: Domain Service, Application Service](https://stackoverflow.com/questions/2268699/domain-driven-design-domain-service-application-service)
