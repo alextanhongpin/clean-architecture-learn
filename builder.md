@@ -84,3 +84,77 @@ func (b *PersonBuilder) Build() Person {
 	return p
 }
 ```
+
+## Improvements
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	fmt.Println("Hello, playground")
+}
+
+type personValidator interface {
+	Validate(p *Person) error
+}
+
+// PersonBuilder with fluent interface. An advantage is we can build a valid person without passing all arguments to the constructor.
+type PersonBuilder struct {
+	p      *Person
+	errors []error
+	validator personValidator
+}
+
+func (b *PersonBuilder) WithAge(age int) *PersonBuilder {
+	// Handle validation per field. (Or better, use value object).
+	if age > 150 || age < 0 {
+		b.errors = append(b.errors, ErrInvalidAge)
+		return b
+	}
+	b.p.age = age
+	return b
+}
+func (b *PersonBuilder) WithName(name string) *PersonBuilder {
+	// Convert primitives into value object/domain primitives.
+	username, err := NewUsername(name)
+	if err != nil {
+		b.errors = append(b.errors, err)
+		return b
+	}
+	b.p.name = username
+	return b
+}
+
+// Alternatively, we can pass a validator to validate the struct as a whole.
+func (b *PersonBuilder) WithValidator(validator personValidator) *PersonBuilder {
+	b.validator = validator
+	return b
+}
+
+// Build builds and validate the person entity.
+func (b *PersonBuilder) Build() (Person, error) {
+	if err := b.validator.Validate(b.p); err != nil {
+		return Person{}, err
+	}
+	// REDACTED
+	return p, nil
+}
+
+
+// Another alternative is to always pass a validation during build time.
+func (b *PersonBuilder) Build(validator personValidator) (Person, error) {
+	if err := validator.Validate(b.p); err != nil {
+		return Person{}, err
+	}
+	// REDACTED
+	return p, nil
+}
+```
+
+# References
+https://www.ssw.com.au/rules/rules-to-better-clean-architecture
+
+
