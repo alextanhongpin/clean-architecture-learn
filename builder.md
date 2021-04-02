@@ -86,6 +86,8 @@ func (b *PersonBuilder) Build() Person {
 ```
 
 ## Improvements
+
+on second thought, avoid validation in builder. Validation shoukd be performed after the object is built. The reason is simple, whwn loading an entity from the db, most of the fields can and will be empty. The reason to use builder is it has access to all entity setters. entity will be mostly read only with getters. They can have setters but with validation to protect against invariant.
 ```go
 package main
 
