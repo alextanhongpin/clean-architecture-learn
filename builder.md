@@ -153,7 +153,79 @@ func (b *PersonBuilder) Build(validator personValidator) (Person, error) {
 	return p, nil
 }
 ```
+## Building nested entity
 
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type Address struct {
+	street string
+}
+
+type AddressBuilder struct {
+	address     *Address
+	userBuilder *UserBuilder
+}
+
+func (b *AddressBuilder) WithStreet(street string) *AddressBuilder {
+	b.address.street = street
+	return b
+}
+
+func (b *AddressBuilder) Build() *Address {
+	a := b.address
+	b.address = nil
+	return a
+}
+
+func (b *AddressBuilder) BuildUserAddress() *UserBuilder {
+	a := b.Build()
+	b.userBuilder.user.address = *a
+	return b.userBuilder
+}
+
+type User struct {
+	name    string
+	address Address
+}
+type UserBuilder struct {
+	user *User
+}
+
+func (b *UserBuilder) WithName(name string) *UserBuilder {
+	b.user.name = name
+	return b
+}
+
+func (b *UserBuilder) AddAddress() *AddressBuilder {
+	return &AddressBuilder{
+		address:     new(Address),
+		userBuilder: b,
+	}
+}
+
+func (b *UserBuilder) Build() *User {
+	user := b.user
+	b.user = nil
+	return user
+}
+
+func main() {
+	b := &UserBuilder{
+		user: new(User),
+	}
+	user := b.WithName("john doe").
+		AddAddress().
+		WithStreet("street 1").
+		BuildUserAddress().
+		Build()
+	fmt.Println(user)
+}
+```
 # References
 https://www.ssw.com.au/rules/rules-to-better-clean-architecture
 
