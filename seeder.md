@@ -2,6 +2,23 @@
 
 Not part of clean architecture, but we want a "clean" option to seed nested data, as well as allow overriding of entity at each nested level.
 
+Pseudo code:
+```go
+// To create item, we need user and product first.
+ub := buildUser() // Build with default values
+ub.Name = "john" // Override fields.
+ub.Age = 20
+user := createUser(ub) 
+
+pb := buildProduct()
+pb.UserID = user.ID // Attach user id.
+product := creatProduct(pb)
+
+ib := buildItem()
+ib.ProductID = product.ID
+item := createItem(ib)
+```
+
 ```go
 package main
 
