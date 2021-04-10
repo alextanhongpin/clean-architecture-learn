@@ -8,6 +8,12 @@
 - are repositories implemented as class or functions? Ideally class, but usually it is for namespacing purposes, and also allows an abstract class/interface to be defined alongside. 
 - is partial update allowed in repository. Usually the whole entity is fetched first prior to update, and then the fields are updated before saved. However, for performance reason (and also simplicity, since we know what field will be modified), partial updates should be allowed. This is either done by having partial dtos at the repository layer for updates 
 
+
+on partial updates
+https://stackoverflow.com/questions/19407390/domain-driven-design-how-to-handle-updates-for-parts-of-your-aggregrate-roots
+
+https://enterprisecraftsmanship.com/posts/partially-initialized-entities-anti-pattern/
+
 ## About the layer
 - where does the repository _interface_ layer belongs to? In the domain layer, a.k.a (domain > repository) (See [3])
 - where does the repository _implementation_ layer belongs to? Ideally between the __application service__ and __domain model__. Some place it in the __persistence layer__. 
