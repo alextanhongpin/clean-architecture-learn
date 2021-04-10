@@ -6,7 +6,7 @@
 - are repositories entity specific? Nope, design entity for an aggregate, see [1].
 - can a repository have business logic? Nope :smile:
 - are repositories implemented as class or functions? Ideally class, but usually it is for namespacing purposes, and also allows an abstract class/interface to be defined alongside. 
-
+- is partial update allowed in repository. Usually the whole entity is fetched first prior to update, and then the fields are updated before saved. However, for performance reason (and also simplicity, since we know what field will be modified), partial updates should be allowed. This is either done by having partial dtos at the repository layer for updates 
 
 ## About the layer
 - where does the repository _interface_ layer belongs to? In the domain layer, a.k.a (domain > repository) (See [3])
