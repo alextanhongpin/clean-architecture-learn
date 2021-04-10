@@ -14,6 +14,10 @@ https://stackoverflow.com/questions/19407390/domain-driven-design-how-to-handle-
 
 https://enterprisecraftsmanship.com/posts/partially-initialized-entities-anti-pattern/
 
+what other alternatives for partial update? perhaps we can diff the changes into a generic data structure, and then only update those fields that changed. However, this might not detect fields tha are removed.
+
+for repository, we may also want to distinguish between update put and patch. cause for null columns, there might be times we want to set them back to null.
+
 ## About the layer
 - where does the repository _interface_ layer belongs to? In the domain layer, a.k.a (domain > repository) (See [3])
 - where does the repository _implementation_ layer belongs to? Ideally between the __application service__ and __domain model__. Some place it in the __persistence layer__. 
