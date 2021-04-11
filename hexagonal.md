@@ -10,8 +10,15 @@ We will typically separate the primary ports and secondary ports folders as such
 - primary ports can be `http/`, `graph/` (for graphql), `grpc/`, `cli/` etc
 - secondary ports are named `infra/` and contains the interface as well as implementation for database, repository, cache, logging, message bus etc.
 
+
 # References
 
 1. [Medium: Ports & Adapters architecture](https://wkrzywiec.medium.com/ports-adapters-architecture-on-example-19cab9e93be7)
 2. [DevTo: Hexagonal architecture: Ports and Adapters](https://dev.to/jofisaes/hexagonal-architecture-ports-and-adapters-1h4m)
 3. [Layers, ports & adapters - Part 3, Ports & Adapters](https://matthiasnoback.nl/2017/08/layers-ports-and-adapters-part-3-ports-and-adapters/)
+
+
+https://alistair.cockburn.us/hexagonal-architecture/
+https://fideloper.com/hexagonal-architecture
+https://www.freecodecamp.org/news/a-typescript-stab-at-clean-architecture-b51fbb16a304/
+
