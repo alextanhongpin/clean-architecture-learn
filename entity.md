@@ -79,7 +79,7 @@ func (u User) Hobbies() []string {
 ## Use withers instead of setters to avoid mutating the data
 
 Withers should protect against invariant.
-```sql
+```go
 func (u User) WithName(name string) (User, error) {
 	if len(name) == "" {
 		return u, errors.New("name cannot be empty")
