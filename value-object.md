@@ -30,7 +30,7 @@ func main() {
 }
 ```
 
-The only workaround is to use interface:
+One workaround is to use interface:
 
 ```go
 package main
@@ -124,6 +124,44 @@ func main() {
 	fmt.Println(p)
 }
 ```
+
+## The always valid
+
+Given the `Email` value object:
+```go
+type Email struct {
+	value string
+}
+
+func NewEmail(v string) (Email, error) {
+	if len(v) == 0 {
+		return Email{}, errors.New("email: cannot be empty")
+	}
+	if !isEmail(v) {
+		return Email{}, errors.New("email: invalid")
+	}
+	return Email{
+		value: v,
+	}, nil
+}
+```
+
+A valid email can only be build from the constructor. However, when loading from the database, the value can be empty too, so instead of returning pointer email, we return a null object pattern.
+
+```go
+// Not this
+func NewEmail(v string) (*Email, error) {}
+
+// Do this
+func NewEmail(v string) (Email, error) {}
+```
+
+This allows us to skip the error when loading from the db, while creating a valid object:
+```go
+email, _ := NewEmail(emailFromDB)
+```
+
+The takeaway is, when reading value objects, they can be invalid (if they are not set). However, when writing, they have to be valid.
 
 # References
 
