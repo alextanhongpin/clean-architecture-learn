@@ -35,6 +35,15 @@ for repository, we may also want to distinguish between update put and patch. ca
 ## About persistence
 - should one repository map to one database table? Nope, you should never create a repository for each table in the database. (See [1]).
 
+## DB Partial Update
+
+A lot of solution uses DataMapper pattern - mapping only non-empty fields from the DTO to domain Entity.
+https://www.baeldung.com/spring-data-partial-update
+https://stackoverflow.com/questions/15329436/partial-updates-for-entities-with-repository-dto-patterns-in-mvc-prepping-for-a
+https://softwareengineering.stackexchange.com/questions/389542/updating-the-db-in-the-repository-from-a-dto-in-a-layered-architecture
+https://auth0.com/blog/automatically-mapping-dto-to-entity-on-spring-boot-apis/
+
+
 # References
 
 1. [Microsoft DDD CQRS Pattern: Infrastructure Persistence Layer Design](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design#:~:text=Repositories%20are%20classes%20or%20components,required%20to%20access%20data%20sources.&text=Conceptually%2C%20a%20repository%20encapsulates%20a,closer%20to%20the%20persistence%20layer.)
