@@ -45,6 +45,69 @@ There are several options for constructor, but ideally we want one that can scal
 - on build for builder pattern, pass in a validator to validate for different constructor args
 - group related entity fields as value objects, e.g. Address, Confirmable
 
+# Golang example
+
+
+## Make properties private
+To protect against direct modification, which could lead to inconsistent state, e.g. setting name to empty string.
+```go
+type User struct {
+	name        string
+	email       string
+	hobbies     []string
+	phoneNumber *string
+}
+```
+
+## Use getters and return copies
+
+```go
+func (u User) Name() string {
+	return u.name
+}
+```
+
+For slices, always return the copy of the slice.
+```go
+func (u User) Hobbies() []string {
+	out := make([]string, len(u.hobbies))
+	copy(out, u.hobbies)
+	return out
+}
+```
+
+## Use withers instead of setters to avoid mutating the data
+
+Withers should protect against invariant.
+```sql
+func (u User) WithName(name string) (User, error) {
+	if len(name) == "" {
+		return u, errors.New("name cannot be empty")
+	}
+	u.name = name
+	return u, nil
+}
+```
+
+## Use pointers to indicate optional field
+```go
+type User struct {
+	/*REDACTED*/
+	phoneNumber *string
+}
+
+func (u User) WithPhoneNumber(phoneNumber string, exists bool) (User, error) {
+	if !exists {
+		return u, nil
+	}
+	if !checkPhoneNumberValid(phoneNumber) {
+		return u, errors.New("invalid phone number")	
+	}
+	u.phoneNumber = phoneNumber
+	return u, nil
+}
+```
+
 ## References
 
 1. [StackOverflow: Validation in Domain Model of Domain Service](https://stackoverflow.com/questions/35934713/validation-in-domain-model-of-domain-service)
