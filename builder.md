@@ -228,6 +228,18 @@ func main() {
 	fmt.Println(user)
 }
 ```
+
+
+
+
+
+## Nested Builder pattern
+https://thorben-janssen.com/builder-pattern-hibernate/
+
+## Fluent interface
+https://assist-software.net/blog/how-design-and-implement-fluent-interface-pattern-c
+https://betterprogramming.pub/what-is-the-fluent-interface-design-pattern-2797645b2a2e
+
 # References
 https://www.ssw.com.au/rules/rules-to-better-clean-architecture
 
