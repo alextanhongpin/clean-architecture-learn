@@ -166,3 +166,4 @@ The takeaway is, when reading value objects, they can be invalid (if they are no
 # References
 
 1. [DTO vs Value Object vs POCO](https://enterprisecraftsmanship.com/posts/dto-vs-value-object-vs-poco/#:~:text=DTO%20is%20a%20class%20representing%20some%20data%20with%20no%20logic%20in%20it.&text=On%20the%20other%20hand%2C%20Value,t%20have%20its%20own%20identity.)
+2. http://gorodinski.com/blog/2012/05/19/validation-in-domain-driven-design-ddd/
