@@ -42,7 +42,26 @@ https://www.baeldung.com/spring-data-partial-update
 https://stackoverflow.com/questions/15329436/partial-updates-for-entities-with-repository-dto-patterns-in-mvc-prepping-for-a
 https://softwareengineering.stackexchange.com/questions/389542/updating-the-db-in-the-repository-from-a-dto-in-a-layered-architecture
 https://auth0.com/blog/automatically-mapping-dto-to-entity-on-spring-boot-apis/
+http://codebetter.com/iancooper/2011/04/12/repository-saveupdate-is-a-smell/
 
+Most repository pattern assumes the following pseudo code:
+
+```js
+class User {}
+
+class UserRespository {
+   async save(user: User) {
+      // The save does not take into consideration whether the User is new or partially updated.
+   }
+}
+```
+
+There are a few problems here:
+- the save does not take into consideration whether the fields are filled or partial, so there may be overriding of fields with value to empty 
+- one way to mitigate this is to load the entire entity, perform updates and save the entity back. This handles the limitation above, but at the price of performance. 
+- a better way is to perform partial updates, where only a subset of fields are updated
+- it is also possible to diff the fields with values that has changed, and pass them to the ORM
+- the idea above is the same as event sourcing, except that with event sourcing, the events are defined manually
 
 # References
 
