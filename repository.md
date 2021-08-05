@@ -32,6 +32,8 @@ for repository, we may also want to distinguish between update put and patch. ca
    - Simple, if we do this, we cannot chain it with other repository methods
    - It makes testing harder, it is harder to override the transaction or will lead to nested transaction
 
+- repository has its own dto model, which will map back to the domain model. the mapping is done in the repository layer. https://softwareengineering.stackexchange.com/questions/404076/domain-vs-entities-model-domain-driven-design-ddd
+
 ## About persistence
 - should one repository map to one database table? Nope, you should never create a repository for each table in the database. (See [1]).
 
