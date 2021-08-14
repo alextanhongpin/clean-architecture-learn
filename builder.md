@@ -244,3 +244,55 @@ https://betterprogramming.pub/what-is-the-fluent-interface-design-pattern-279764
 https://www.ssw.com.au/rules/rules-to-better-clean-architecture
 
 
+## After a while
+
+- builder don't need validation, if required, it should have been in a constructor
+- the need for builder is when the entity becomes too large, in the first place, we need to consider why the entity is too large. If they are just a representation of the database object, then the definition could be wrong. An entity should only contains fields that are necessary for the behaviour. 
+
+We could inverse the relationship instead and construct the model from the given database entity:
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+type Person struct {
+	Name     string
+	Age      int64
+	Password string
+}
+
+type PersonModel struct {
+	p Person
+}
+
+func (m *PersonModel) SetPassword(password string) error {
+	if len(password) < 8 {
+		return errors.New("password too short")
+	}
+	m.p.Password = password
+	return nil
+}
+
+func (m *PersonModel) Person() Person {
+	return m.p
+}
+
+func main() {
+	p := Person{
+		Name: "john",
+	}
+	pm := PersonModel{p: p}
+	err := pm.SetPassword("topsecret")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(pm.Person())
+}
+```
+
+However, the repository is supposed to return the `domain model`, not the db representation which will then be used to construct the domain model at the application service.
+- The other approach is to just separate the read and write part. For most write part, you do not need to access the read part at all. 
