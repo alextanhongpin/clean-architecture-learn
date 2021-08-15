@@ -95,7 +95,7 @@ type User struct {
 	/*REDACTED*/
 	phoneNumber *string
 }
-
+// Setters should not be pointers. So if you want to set a pointer value, pass the value and a field valid to indicate if the value should be set.
 func (u User) WithPhoneNumber(phoneNumber string, exists bool) (User, error) {
 	if !exists {
 		return u, nil
@@ -108,7 +108,14 @@ func (u User) WithPhoneNumber(phoneNumber string, exists bool) (User, error) {
 }
 ```
 
+## Use builder to set fields from repository layer
+
+Setters on domain model shoyld onlybe used to modify entity fields without violating invariants. You dont expose setters for every field. However, when loading model from repository (remember, repository return domain model), you may need to set all fields for the model, whether valid or invalid.
+
+However, due to the private fields, you will end up with huge constructorvwhen setting the fields, or you might need to expose alternative and every setters that are invariant free (or by checking if value is valid before setting). The solution is to just separate the construction of the domain model to the builder.
+
 ## References
 
 1. [StackOverflow: Validation in Domain Model of Domain Service](https://stackoverflow.com/questions/35934713/validation-in-domain-model-of-domain-service)
 2. [StackOverflow: Using Repository in Entity for validation before update](https://stackoverflow.com/questions/55549616/ddd-using-repository-in-entity-for-validation-before-update)
+3. [Quasiclass](http://www.idinews.com/quasiClass.pdf)
