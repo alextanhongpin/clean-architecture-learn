@@ -32,6 +32,14 @@ Batch validation, precise row with error.
 Using interfaces to represent entity.
 What is an entity? Something that has lifecycle?
 
+# Repository
+- business logic in db
+- mapping errors to domain
+- passive errors, errors returned after insert or update
+- active errors, errors returned before insert
+- bulk errors
+- errors from triggers, constraint, integrity
+
 How to represent an entity?
 - struct with public fields
 - Struct with private fields, and getters
