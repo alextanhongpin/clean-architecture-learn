@@ -12,14 +12,25 @@ Domain update
 2. Make changes
 3. Save changes
 
+while this may sound like its perfect, it will eventually be prone to data race. If multiple users are updating the same entity, you may want to lock the row first. This is also the same issue when returning an entity after update (not insert), because their representation may differ. Hence the changeset patterns makes sense.
+
+Updating whole row is not a performance issue on postgres, so updates can be simplified greatly.
+
+You may need to fetch and update if
+- past data is required, e.g for state transition (though this could be part of sql filter query)
+- there is not enough information to validate if the changes are valid, e.g acl, bool flags or statuses
+- there may be other associations that are required for cross validation
+
 Change set
-1. Validate changes
+1. pre validate changes locally
 2. Save changes
 3. Handle errors
 
 Change set makes sense for
 - bulk
 - Non business logic fields, like remarks
+- there is no need to validate against past data
+- changeset are value object can be validated as a whole, e.g. user address
 
 Ddd, vs crud
 Data vs behaviour
@@ -39,8 +50,9 @@ What is an entity? Something that has lifecycle?
 - active errors, errors returned before insert
 - bulk errors
 - errors from triggers, constraint, integrity
-- if the data can be validated in bulk before insert, then aggregate them before i sertion
+- if the data can be validated in bulk before insert, then aggregate them before insertion
 - else, insert them line by line in a single transaction to get the specific error message
+- behaviour is global, since the db is the main aggregate. data fetched in application is just partial local aggregate. 
 
 How to represent an entity?
 - struct with public fields
