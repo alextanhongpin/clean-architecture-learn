@@ -39,6 +39,8 @@ What is an entity? Something that has lifecycle?
 - active errors, errors returned before insert
 - bulk errors
 - errors from triggers, constraint, integrity
+- if the data can be validated in bulk before insert, then aggregate them before i sertion
+- else, insert them line by line in a single transaction to get the specific error message
 
 How to represent an entity?
 - struct with public fields
