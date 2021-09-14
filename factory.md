@@ -8,7 +8,8 @@
 - can factory access repository (? yes, but avoid that if possible. Are there any good usecase to demonstrate it?)
 - factory is responsible for constructing complex aggregates in their valid states. So a constructor can be a factory too
 - factory can be plain functions, for complex factory that requires other 
-
+- when to use factory vs constructor? When the construction requires external dependency, or the output is an aggregate of muktiple entities
+- where do factory belong? still doman layer
 
 # Builder
 
