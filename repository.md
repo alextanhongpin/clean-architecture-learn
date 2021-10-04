@@ -4,7 +4,8 @@
 - there are two parts, the _interface_ and also the _implementation_ layer. The interface only defines the contracts (input/output), and the implementation is storage specific. In hexagonal architecture, _interface_ is the _port_, _implementation_ is the _adapter_.
 - what is the input and output of repository? The input/output is the domain entity, but can also be basic primitives.
 - are repositories entity specific? Nope, design entity for an aggregate, see [1].
-- can a repository have business logic? Nope :smile:
+- can a repository have business logic? Nope :smile: 
+- are filter logic and/or conditional logic in repository business logic? Yes and no. You can treat them as domain business logic or aggregate logic, e,g fetching total issues count in a bug tracking application, or checking uniqueness of email could be aggregate logic
 - are repositories implemented as class or functions? Ideally class, but usually it is for namespacing purposes, and also allows an abstract class/interface to be defined alongside. 
 - is partial update allowed in repository. Usually the whole entity is fetched first prior to update, and then the fields are updated before saved. However, for performance reason (and also simplicity, since we know what field will be modified), partial updates should be allowed. This is either done by having partial dtos at the repository layer for updates 
 
@@ -31,7 +32,7 @@ for repository, we may also want to distinguish between update put and patch. ca
 - why shouldn't we start the transaction at this layer? 
    - Simple, if we do this, we cannot chain it with other repository methods
    - It makes testing harder, it is harder to override the transaction or will lead to nested transaction
-
+- do i need repository for the reason of enabling swapping or db or mocking of db? Nope, both is not a strong reason to have repository layer because you need to test your queries against your external store/remote data anyway (not necessarily sql). But repository do hide the complexity of the query and make it reusable. 
 - repository has its own dto model, which will map back to the domain model. the mapping is done in the repository layer. https://softwareengineering.stackexchange.com/questions/404076/domain-vs-entities-model-domain-driven-design-ddd
 
 ## About persistence
