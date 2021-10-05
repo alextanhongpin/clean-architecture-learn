@@ -34,6 +34,35 @@ Questions
 - do i need to define a type for each layer, e.g. usecase.User, repository.User, entity.User? Nope, https://softwareengineering.stackexchange.com/questions/303478/uncle-bobs-clean-architecture-an-entity-model-class-for-each-layer
 - why not user service, repository and entity in user package, vs separate repository for each? Circular dependency
 
+
+What is a Model?
+- a representation of your domain object
+- contains rich behaviour
+- Contains reference to other model
+- Attributes may be primitive or value object
+
+What is an Entity?
+- a subset of your model (may or may not mimic your model)
+- The persisted view of your model
+- The model is always translatable to an entity, and vice versa
+- Attributes may be db specific (but not necessarily)
+
+
+What is a repository?
+- fetches model and aggregate from a remote store (external request, remote store, client)
+
+What is an Aggregate?
+- composed of one or more model
+- For business logic that spans across multiple entities
+- Can be returned from a repository
+- Why not service? Service may not require the aggregate to be called together (user may forget)
+(Show an example of an aggregate and non aggregate)
+(Show a good aggregate vs bad aggregate)
+
+
+
+
+
 # References
 
-1. [StackOverflow: UseCase-Drive vs Domain-Driven](https://stackoverflow.com/questions/3173070/design-methodology-use-case-driven-vs-domain-driven)
+[^1]: [StackOverflow: UseCase-Drive vs Domain-Driven](https://stackoverflow.com/questions/3173070/design-methodology-use-case-driven-vs-domain-driven)
