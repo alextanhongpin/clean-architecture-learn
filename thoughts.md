@@ -1,4 +1,4 @@
-Using interface as a contract
+## Using interface as a contract
 
 - specifying concrete types means modifying input structs when a new field is added
 - On the other hand, changing interface just requires changing the internal implementation (granted that all those fields are provided)
