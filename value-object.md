@@ -8,6 +8,8 @@ Primitive obsession is an anti-pattern, and value objects are highly recommended
 - The only difference between Value Object and Entity is that Value Object doesn’t have its own identity.
 - Value Object are `comparable` by values
 - Value Objects do contain logic and, typically, they are not used for transferring data between application boundaries.
+- value object does not have identity, so no id field
+- good contender of value object is stock quantity, age, email
 
 # Example
 
