@@ -89,3 +89,10 @@ Bitemporal
 
 Workflow step and domain model
 Embedding model in flow
+
+
+# No to clean architecture
+
+
+http://johannesbrodwall.com/2014/07/10/the-madness-of-layered-architecture/
+https://garywoodfine.com/why-i-dont-like-layered-architecture-for-microservices/
