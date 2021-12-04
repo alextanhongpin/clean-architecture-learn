@@ -66,6 +66,15 @@ There are a few problems here:
 - it is also possible to diff the fields with values that has changed, and pass them to the ORM
 - the idea above is the same as event sourcing, except that with event sourcing, the events are defined manually
 
+
+## Should I map repository types to domain types?
+
+There's a lot of work mapping from one layer to another, especially when they are almost a 1-to-1 representation. However, when they are not, it is always beneficial to separate repository types from domain types. 
+
+There are some scenarios that would eventually lead to that:
+- custom columns in db layer that cannot be mapped directly to domain types, e.g. go's sqlc might generate multiple types depending on the query, like `GetUserWithNameRows`, `GetUserWithEmailRows` that has same fields but different types that needs to be mapped back to User entity
+- composition of multiple entities that are fetched from joins instead (ORMs are not efficient at separating them, so fetching say `user` joined to `accounts` requires custom mapping to separate them if the tool you use does not separate the `User` and `Account` type
+
 # References
 
 1. [Microsoft DDD CQRS Pattern: Infrastructure Persistence Layer Design](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design#:~:text=Repositories%20are%20classes%20or%20components,required%20to%20access%20data%20sources.&text=Conceptually%2C%20a%20repository%20encapsulates%20a,closer%20to%20the%20persistence%20layer.)
