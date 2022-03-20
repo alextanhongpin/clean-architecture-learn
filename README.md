@@ -66,3 +66,8 @@ What is an Aggregate?
 # References
 
 [^1]: [StackOverflow: UseCase-Drive vs Domain-Driven](https://stackoverflow.com/questions/3173070/design-methodology-use-case-driven-vs-domain-driven)
+
+where to put domain services
+https://stackoverflow.com/questions/48200345/ddd-where-should-logic-go-that-tests-the-existence-of-an-entity
+https://medium.com/geekculture/an-introduction-to-domain-driven-design-f29fc1877e2a
+https://stackoverflow.com/questions/48200345/ddd-where-should-logic-go-that-tests-the-existence-of-an-entity
