@@ -165,9 +165,14 @@ email, _ := NewEmail(emailFromDB)
 
 The takeaway is, when reading value objects, they can be invalid (if they are not set). However, when writing, they have to be valid.
 
-## My take on value object now
+## 2022: My take on value object now
 
-Given the same `Password` example above, I would have write it this way now:
+Given the same `Password` example above, I would have write it this way now below.
+
+The major changes are:
+- a `Validate` method is added to encapsulate the validation method
+- the `Validate` method is now called during construction, as well as when returning the `Value`, this ensures that the value will always be valid
+- a new private field `constructed` is added, to check if the values are constructed through the constructor. This prevents declaration of the variables or variable pointer since by default the boolean value will always be false
 
 ```go
 // You can edit this code!
