@@ -257,6 +257,74 @@ func main() {
 }
 ```
 
+And the email example, which handles scenario where other developers can just declare the variables:
+
+```go
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
+
+var (
+	ErrEmailNotSet   = errors.New("email not set")
+	ErrEmailRequired = errors.New("email is required")
+	ErrEmailInvalid  = errors.New("email is invalid")
+)
+
+func main() {
+	email, err := NewEmail("john.doe@mail.com")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(email.Value())
+
+	var email2 *Email
+	// fmt.Println(email2.Value()) // panic
+	fmt.Println(email2.Validate())
+
+	var email3 Email
+	fmt.Println(email3.Value())
+	fmt.Println(email3.Validate())
+}
+
+type Email struct {
+	value       string
+	constructed bool
+}
+
+func (e *Email) Value() (string, error) {
+	return e.value, e.Validate()
+}
+
+func (e *Email) Validate() error {
+	if e == nil || !e.constructed {
+		return ErrEmailNotSet
+	}
+	if e.value == "" {
+		return ErrEmailRequired
+	}
+
+	// Naive checking - don't do this in production, this is only for demonstration purpose.
+	if !strings.Contains(e.value, "@") {
+		return ErrEmailInvalid
+	}
+	return nil
+}
+
+func NewEmail(v string) (*Email, error) {
+	email := &Email{value: v, constructed: true}
+	if err := email.Validate(); err != nil {
+		return nil, err
+	}
+	return email, nil
+}
+```
+
 # References
 
 1. [DTO vs Value Object vs POCO](https://enterprisecraftsmanship.com/posts/dto-vs-value-object-vs-poco/#:~:text=DTO%20is%20a%20class%20representing%20some%20data%20with%20no%20logic%20in%20it.&text=On%20the%20other%20hand%2C%20Value,t%20have%20its%20own%20identity.)
