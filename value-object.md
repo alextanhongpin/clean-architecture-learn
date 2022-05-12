@@ -165,6 +165,98 @@ email, _ := NewEmail(emailFromDB)
 
 The takeaway is, when reading value objects, they can be invalid (if they are not set). However, when writing, they have to be valid.
 
+## My take on value object now
+
+Given the same `Password` example above, I would have write it this way now:
+
+```go
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+const MinPasswordLen = 8
+
+var (
+	ErrEmptyPassword    = errors.New("password is empty")
+	ErrPasswordNotSet   = errors.New("password not set")
+	ErrPasswordTooShort = errors.New("password too short")
+)
+
+type Password struct {
+	// This is still preferred over "type Password string"
+	// because the only way to set the "value" is through the constructor.
+	value       string
+	constructed bool
+}
+
+func (p *Password) Validate() error {
+	// Not set is not the same as empty.
+	if p == nil || !p.constructed {
+		return ErrPasswordNotSet
+	}
+
+	if p.value == "" {
+		return ErrEmptyPassword
+	}
+
+	if len(p.value) < MinPasswordLen {
+		return ErrPasswordTooShort
+	}
+
+	return nil
+}
+
+func NewPassword(v string) (*Password, error) {
+	p := &Password{value: v, constructed: true}
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+func (p Password) Value() (string, error) {
+	return p.value, p.Validate()
+}
+
+func (p Password) String() string {
+	if !p.constructed {
+		return "NOT SET"
+	}
+
+	// This condition below is not possible.
+	if p.value == "" {
+		return "EMPTY"
+	}
+
+	return "**REDACTED**"
+}
+
+func main() {
+	p, err := NewPassword("hello world")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(p.Value())
+	fmt.Println(p.Validate(), "// p")
+
+	var p2 Password
+	fmt.Println(p2.Validate(), p2, "// p2")
+
+	var p3 *Password
+	fmt.Println(p3.Validate(), p3, "// p3")
+
+	p4, err := NewPassword("")
+	if err != nil {
+		fmt.Println(err, p4, "// p4")
+	}
+}
+```
+
 # References
 
 1. [DTO vs Value Object vs POCO](https://enterprisecraftsmanship.com/posts/dto-vs-value-object-vs-poco/#:~:text=DTO%20is%20a%20class%20representing%20some%20data%20with%20no%20logic%20in%20it.&text=On%20the%20other%20hand%2C%20Value,t%20have%20its%20own%20identity.)
