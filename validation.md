@@ -50,6 +50,8 @@ func main() {
 
 	printEmail(NewValidator(email))
 	printEmail(u.PublicEmail)
+
+	fmt.Println(email.Value())
 }
 
 // Wrapping the Email in ToValidate enforces that Validate method be called before performing an action.
@@ -102,6 +104,10 @@ func (e *Email) Validate() error {
 		return ErrInvalidEmail
 	}
 	return nil
+}
+
+func (e *Email) Value() (string, error) {
+	return e.value, e.Validate()
 }
 
 type User struct {
