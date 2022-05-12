@@ -19,6 +19,41 @@ The best way to prevent invariants is to
 
 However, that does not apply to all language, e.g. golang, where you can declare a new variable without enforcing constructor. One possible solution is to add deferred validation, through a `Validate` method, and wrap the types in interface containers that requires the `Validate` method to be called.
 
+Refresher on nil pointer with callable methods call:
+```go
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+var ErrProductNotFound = errors.New("product not found")
+
+func main() {
+	var p1 Product
+	var p2 *Product
+	p3 := new(Product)
+	
+	fmt.Println(p1.Validate()) // <nil>
+	fmt.Println(p2.Validate()) // product not found
+	fmt.Println(p3.Validate()) // nil
+}
+
+type Product struct{}
+
+func (p *Product) Validate() error {
+	if p == nil {
+		return ErrProductNotFound
+	}
+	return nil
+}
+```
+
+Implementation of field _decorator_:
+
 ```go
 // You can edit this code!
 // Click here and start typing.
