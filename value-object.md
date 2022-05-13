@@ -369,6 +369,50 @@ func NewEmail(v string) (*Email, error) {
 }
 ```
 
+## Defining value object
+
+For the value object created, we might just want to expose the primitive type and not caring about the actual implementation.
+
+```go
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import "fmt"
+
+func main() {
+	u := User{
+		email: &Email{value: "john@mail.com"},
+	}
+	fmt.Println(u)
+	fmt.Println("Hello, 世界")
+}
+
+type Validatable interface {
+	Validate() error
+}
+
+type Value[T any] interface {
+	Value() (T, error)
+	Validatable
+}
+
+type User struct {
+	email Value[string] // An value object of type string.
+}
+
+type Email struct {
+	value string
+}
+
+func (e *Email) Value() (string, error) {
+	return e.value, nil
+}
+
+func (e *Email) Validate() error {
+	return nil
+}
+```
 
 # References
 
