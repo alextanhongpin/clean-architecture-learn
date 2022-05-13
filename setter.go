@@ -33,3 +33,30 @@ func (s *Setter[T]) Set(t T) {
 	s.value = t
 	s.dirty = true
 }
+
+
+-- set.go --
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+type S struct{}
+
+func (S) Valid() bool {
+	return true
+}
+func main() {
+	var s S
+	InvokeValid(s, "Valid")
+	fmt.Println("Hello, 世界")
+}
+func InvokeValid(s any, name string) {
+	t := reflect.Indirect(reflect.ValueOf(s))
+	v := t.MethodByName(name).Call([]reflect.Value{})
+	return v[0].Bool()
+}
