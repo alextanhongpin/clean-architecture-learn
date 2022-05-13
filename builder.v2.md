@@ -35,10 +35,13 @@ type Address struct {
 	Country  string
 }
 
+// Declare it once.
+var NewUserBuilder = NewBuilder(User{})
+
 func main() {
 	// Cons: Only work with public fields at the moment, due to json unmarshaling skipping private fields.
-	builder := NewBuilder(User{})
-	user := builder.
+
+	user := NewUserBuilder().
 		Set("Name", "john").
 		Set("Age", 10).
 		Set("Hobbies", []string{"dancing"}).
@@ -48,7 +51,7 @@ func main() {
 
 	fmt.Println("user:", user)
 
-	user2 := NewBuilder(User{}).SetMap(
+	user2 := NewUserBuilder().SetMap(
 		map[string]interface{}{
 			"Name":    "Jane",
 			"Age":     100,
@@ -65,7 +68,7 @@ type Builder[T any] struct {
 	meta   map[string]reflect.Type
 }
 
-func NewBuilder[T any](t T) *Builder[T] {
+func NewBuilder[T any](t T) func() *Builder[T] {
 	meta := make(map[string]reflect.Type)
 
 	val := reflect.Indirect(reflect.ValueOf(t))
@@ -74,9 +77,11 @@ func NewBuilder[T any](t T) *Builder[T] {
 		meta[f.Name] = f.Type
 	}
 
-	return &Builder[T]{
-		values: make(map[string]interface{}),
-		meta:   meta,
+	return func() *Builder[T] {
+		return &Builder[T]{
+			values: make(map[string]interface{}),
+			meta:   meta,
+		}
 	}
 }
 
