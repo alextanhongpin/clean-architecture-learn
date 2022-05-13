@@ -414,6 +414,54 @@ func (e *Email) Validate() error {
 }
 ```
 
+Or perhaps we want to declare the actual type alongside the primitive?
+
+```go
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import "fmt"
+
+func main() {
+	u := User{
+		email: &Email{value: "john@mail.com"},
+	}
+	fmt.Println(u)
+	fmt.Println("Hello, 世界")
+}
+
+type Validatable interface {
+	Validate() error
+}
+
+type Value[E any, T comparable] interface {
+	Value() (T, error)
+	Self() E
+	Validatable
+}
+
+type User struct {
+	email Value[*Email, string]
+}
+
+type Email struct {
+	value string
+}
+
+func (e *Email) Value() (string, error) {
+	return e.value, nil
+}
+
+func (e *Email) Validate() error {
+	return nil
+}
+
+func (e *Email) Self() *Email {
+	return e
+}
+```
+
 # References
 
 1. [DTO vs Value Object vs POCO](https://enterprisecraftsmanship.com/posts/dto-vs-value-object-vs-poco/#:~:text=DTO%20is%20a%20class%20representing%20some%20data%20with%20no%20logic%20in%20it.&text=On%20the%20other%20hand%2C%20Value,t%20have%20its%20own%20identity.)
