@@ -1,15 +1,13 @@
 ## Builder Pattern with go generics 1.18
 
 ```go
-// You can edit this code!
-// Click here and start typing.
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
-	"strings"
+
+	"play.ground/builder"
 )
 
 var (
@@ -45,7 +43,7 @@ type Address struct {
 }
 
 // Declare it once.
-var NewUserBuilder = NewBuilder(User{})
+var NewUserBuilder = builder.New(User{})
 
 func main() {
 	// Cons: Only work with public fields at the moment, due to json unmarshaling skipping private fields.
@@ -73,6 +71,24 @@ func main() {
 	).BuildPartial()
 	fmt.Println("user2:", user2)
 }
+-- go.mod --
+module play.ground
+-- builder/builder.go --
+package builder
+
+import (
+	"encoding/json"
+	"fmt"
+	"reflect"
+	"strings"
+)
+
+var (
+	TypeString reflect.Type = reflect.TypeOf("")
+	TypeInt    reflect.Type = reflect.TypeOf(0)
+	TypeFloat  reflect.Type = reflect.TypeOf(0.0)
+	TypeBool   reflect.Type = reflect.TypeOf(false)
+)
 
 type Builder[T any] struct {
 	name   string
@@ -80,7 +96,7 @@ type Builder[T any] struct {
 	meta   map[string]reflect.Type
 }
 
-func NewBuilder[T any](t T) func() *Builder[T] {
+func New[T any](t T) func() *Builder[T] {
 	meta := make(map[string]reflect.Type)
 
 	val := reflect.Indirect(reflect.ValueOf(t))
@@ -112,10 +128,10 @@ func (b *Builder[T]) isMatchingType(src, tgt reflect.Type) bool {
 func (b *Builder[T]) setterType(key string) reflect.Type {
 	t, ok := b.meta[key]
 	if !ok {
-		panic(fmt.Errorf("key does not exist: %s", key))
+		panic(fmt.Errorf("%s key does not exist: %s", b.name, key))
 	}
 	if _, isSet := b.values[key]; isSet {
-		panic(fmt.Errorf("key has been set: %s", key))
+		panic(fmt.Errorf("%s key has been set: %s", b.name, key))
 	}
 	return t
 }
@@ -123,7 +139,7 @@ func (b *Builder[T]) setterType(key string) reflect.Type {
 func (b *Builder[T]) SetString(key, value string) *Builder[T] {
 	t := b.setterType(key)
 	if !b.isMatchingType(t, TypeString) {
-		panic(fmt.Errorf("type does not match: expected %s, got %s", t, TypeString))
+		panic(fmt.Errorf("%s %s type does not match: expected %s, got %s", b.name, key, t, TypeString))
 	}
 
 	b.values[key] = value
@@ -133,7 +149,7 @@ func (b *Builder[T]) SetString(key, value string) *Builder[T] {
 func (b *Builder[T]) SetInt(key string, value int) *Builder[T] {
 	t := b.setterType(key)
 	if !b.isMatchingType(t, TypeInt) {
-		panic(fmt.Errorf("type does not match: expected %s, got %s", t, TypeInt))
+		panic(fmt.Errorf("%s %s type does not match: expected %s, got %s", b.name, key, t, TypeInt))
 	}
 
 	b.values[key] = value
@@ -143,7 +159,7 @@ func (b *Builder[T]) SetInt(key string, value int) *Builder[T] {
 func (b *Builder[T]) SetFloat(key string, value float64) *Builder[T] {
 	t := b.setterType(key)
 	if !b.isMatchingType(t, TypeFloat) {
-		panic(fmt.Errorf("type does not match: expected %s, got %s", t, TypeFloat))
+		panic(fmt.Errorf("%s %s type does not match: expected %s, got %s", b.name, key, t, TypeFloat))
 	}
 
 	b.values[key] = value
@@ -153,7 +169,7 @@ func (b *Builder[T]) SetFloat(key string, value float64) *Builder[T] {
 func (b *Builder[T]) SetBool(key string, value bool) *Builder[T] {
 	t := b.setterType(key)
 	if !b.isMatchingType(t, TypeBool) {
-		panic(fmt.Errorf("type does not match: expected %s, got %s", t, TypeBool))
+		panic(fmt.Errorf("%s %s type does not match: expected %s, got %s", b.name, key, t, TypeBool))
 	}
 
 	b.values[key] = value
@@ -171,7 +187,7 @@ func (b *Builder[T]) Set(key string, value interface{}) *Builder[T] {
 	}
 
 	if !b.isMatchingType(t, tt) {
-		panic(fmt.Errorf("type does not match: expected %s, got %s", t, tt))
+		panic(fmt.Errorf("%s %s type does not match: expected %s, got %s", b.name, key, t, tt))
 	}
 
 	b.values[key] = value
