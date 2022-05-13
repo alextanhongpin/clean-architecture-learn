@@ -10,13 +10,6 @@ import (
 	"play.ground/builder"
 )
 
-var (
-	TypeString reflect.Type = reflect.TypeOf("")
-	TypeInt    reflect.Type = reflect.TypeOf(0)
-	TypeFloat  reflect.Type = reflect.TypeOf(0.0)
-	TypeBool   reflect.Type = reflect.TypeOf(false)
-)
-
 type User struct {
 	Name    Name
 	Age     Age
