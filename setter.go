@@ -19,6 +19,10 @@ func main() {
 
 // DeferSet
 // SetBeforeGet
+// nullType with generics
+// Apply setter getter to struct
+// How about combining reflect at runtime (once)
+// And validating fields set?
 
 type Setter[T any] struct {
 	value T
