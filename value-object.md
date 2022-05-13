@@ -174,6 +174,7 @@ The major changes are:
 - the `Validate` method is now called during construction, as well as when returning the `Value`, this ensures that the value will always be valid
 - a new private field `constructed` is added, to check if the values are constructed through the constructor. This prevents declaration of the variables or variable pointer since by default the boolean value will always be false
 
+
 ```go
 // You can edit this code!
 // Click here and start typing.
@@ -182,85 +183,114 @@ package main
 import (
 	"errors"
 	"fmt"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
-const MinPasswordLen = 8
-
 var (
-	ErrEmptyPassword    = errors.New("password is empty")
 	ErrPasswordNotSet   = errors.New("password not set")
 	ErrPasswordTooShort = errors.New("password too short")
 )
 
+func main() {
+	hash, err := NewPassword("hello world")
+	if err != nil {
+		return
+	}
+	fmt.Println(hash)
+	fmt.Println(hash.Match("hello world"))
+	hashValue, err := hash.Value()
+	if err != nil {
+		panic(err)
+	}
+
+	pwd := NewPasswordFromHash(hashValue)
+	fmt.Println(pwd.Match("hello world"))
+
+	var pwd2 *Password
+	fmt.Println(pwd2.Value())
+}
+
 type Password struct {
-	// This is still preferred over "type Password string"
-	// because the only way to set the "value" is through the constructor.
-	value       string
+	// This ensures that structs must be initialized with keys
+	// e.g `&Password{constructed: true}` is allowed,
+	// but `&Password{true}` is not allowed
+	_           struct{}
+	hash        string
 	constructed bool
 }
 
+func NewPasswordFromHash(hash string) *Password {
+	return &Password{
+		constructed: true,
+		hash:        hash,
+	}
+}
+
+func NewPassword(password string) (*Password, error) {
+	pwd := &Password{constructed: true}
+	pwd.encrypt(password)
+	return pwd, pwd.Validate()
+}
+
 func (p *Password) Validate() error {
-	// Not set is not the same as empty.
+	/* We need to check p == nil to guard against variable pointer declaration from panicking, e.g
+	var pwd *Password
+	pwd.Value() // will panic
+	*/
 	if p == nil || !p.constructed {
 		return ErrPasswordNotSet
 	}
 
-	if p.value == "" {
-		return ErrEmptyPassword
-	}
+	return nil
+}
 
-	if len(p.value) < MinPasswordLen {
+func (p *Password) validate(password string) error {
+	if len(password) < 8 {
 		return ErrPasswordTooShort
 	}
 
 	return nil
 }
 
-func NewPassword(v string) (*Password, error) {
-	p := &Password{value: v, constructed: true}
-	if err := p.Validate(); err != nil {
-		return nil, err
+func (p *Password) encrypt(password string) error {
+	if err := p.validate(password); err != nil {
+		return err
 	}
-	return p, nil
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	p.hash = string(hash)
+
+	return nil
 }
 
-func (p Password) Value() (string, error) {
-	return p.value, p.Validate()
+func (p *Password) Match(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(p.hash), []byte(password))
+	return err == nil
 }
 
-func (p Password) String() string {
+func (p *Password) String() string {
 	if !p.constructed {
 		return "NOT SET"
-	}
-
-	// This condition below is not possible.
-	if p.value == "" {
-		return "EMPTY"
 	}
 
 	return "**REDACTED**"
 }
 
-func main() {
-	p, err := NewPassword("hello world")
-	if err != nil {
-		fmt.Println(err)
+func (p *Password) Value() (string, error) {
+	// Early validation to capture nil pointer scenario.
+	if err := p.Validate(); err != nil {
+		return "", err
 	}
-	fmt.Println(p.Value())
-	fmt.Println(p.Validate(), "// p")
 
-	var p2 Password
-	fmt.Println(p2.Validate(), p2, "// p2")
-
-	var p3 *Password
-	fmt.Println(p3.Validate(), p3, "// p3")
-
-	p4, err := NewPassword("")
-	if err != nil {
-		fmt.Println(err, p4, "// p4")
-	}
+	return p.hash, nil
 }
 ```
+
 
 And the email example, which handles scenario where other developers can just declare the variables:
 
@@ -330,113 +360,6 @@ func NewEmail(v string) (*Email, error) {
 }
 ```
 
-## Password Value Object, with actual implementation for bcrypt
-```go
-// You can edit this code!
-// Click here and start typing.
-package main
-
-import (
-	"errors"
-	"fmt"
-
-	"golang.org/x/crypto/bcrypt"
-)
-
-var (
-	ErrPasswordNotSet   = errors.New("password not set")
-	ErrPasswordTooShort = errors.New("password too short")
-)
-
-func main() {
-	hash, err := NewPassword("hello world")
-	if err != nil {
-		return
-	}
-	fmt.Println(hash)
-	fmt.Println(hash.Match("hello world"))
-	hashValue, err := hash.Value()
-	if err != nil {
-		panic(err)
-	}
-	
-	pwd := NewPasswordFromHash(hashValue)
-	fmt.Println(pwd.Match("hello world"))
-
-	var pwd2 Password
-	fmt.Println(pwd2.Value())
-}
-
-type Password struct {
-	// This ensures that structs must be initialized with keys
-	// e.g `&Password{constructed: true}` is allowed,
-	// but `&Password{true}` is not allowed
-	_           struct{}
-	hash        string
-	constructed bool
-}
-
-func NewPasswordFromHash(hash string) *Password {
-	return &Password{
-		constructed: true,
-		hash:        hash,
-	}
-}
-
-func NewPassword(password string) (*Password, error) {
-	pwd := &Password{constructed: true}
-	pwd.encrypt(password)
-	return pwd, pwd.Validate()
-}
-
-func (p *Password) Validate() error {
-	if !p.constructed {
-		return ErrPasswordNotSet
-	}
-
-	return nil
-}
-
-func (p *Password) validate(password string) error {
-	if len(password) < 8 {
-		return ErrPasswordTooShort
-	}
-
-	return nil
-}
-
-func (p *Password) encrypt(password string) error {
-	if err := p.validate(password); err != nil {
-		return err
-	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-
-	p.hash = string(hash)
-
-	return nil
-}
-
-func (p *Password) Match(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(p.hash), []byte(password))
-	return err == nil
-}
-
-func (p *Password) String() string {
-	if !p.constructed {
-		return "NOT SET"
-	}
-
-	return "**REDACTED**"
-}
-
-func (p *Password) Value() (string, error) {
-	return p.hash, p.Validate()
-}
-```
 
 # References
 
