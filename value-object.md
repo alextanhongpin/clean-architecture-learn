@@ -330,6 +330,114 @@ func NewEmail(v string) (*Email, error) {
 }
 ```
 
+## Password Value Object, with actual implementation for bcrypt
+```go
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import (
+	"errors"
+	"fmt"
+
+	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	ErrPasswordNotSet   = errors.New("password not set")
+	ErrPasswordTooShort = errors.New("password too short")
+)
+
+func main() {
+	hash, err := NewPassword("hello world")
+	if err != nil {
+		return
+	}
+	fmt.Println(hash)
+	fmt.Println(hash.Match("hello world"))
+	hashValue, err := hash.Value()
+	if err != nil {
+		panic(err)
+	}
+	
+	pwd := NewPasswordFromHash(hashValue)
+	fmt.Println(pwd.Match("hello world"))
+
+	var pwd2 Password
+	fmt.Println(pwd2.Value())
+}
+
+type Password struct {
+	// This ensures that structs must be initialized with keys
+	// e.g `&Password{constructed: true}` is allowed,
+	// but `&Password{true}` is not allowed
+	_           struct{}
+	hash        string
+	constructed bool
+}
+
+func NewPasswordFromHash(hash string) *Password {
+	return &Password{
+		constructed: true,
+		hash:        hash,
+	}
+}
+
+func NewPassword(password string) (*Password, error) {
+	pwd := &Password{constructed: true}
+	pwd.encrypt(password)
+	return pwd, pwd.Validate()
+}
+
+func (p *Password) Validate() error {
+	if !p.constructed {
+		return ErrPasswordNotSet
+	}
+
+	return nil
+}
+
+func (p *Password) validate(password string) error {
+	if len(password) < 8 {
+		return ErrPasswordTooShort
+	}
+
+	return nil
+}
+
+func (p *Password) encrypt(password string) error {
+	if err := p.validate(password); err != nil {
+		return err
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	p.hash = string(hash)
+
+	return nil
+}
+
+func (p *Password) Match(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(p.hash), []byte(password))
+	return err == nil
+}
+
+func (p *Password) String() string {
+	if !p.constructed {
+		return "NOT SET"
+	}
+
+	return "**REDACTED**"
+}
+
+func (p *Password) Value() (string, error) {
+	return p.hash, p.Validate()
+}
+```
+
 # References
 
 1. [DTO vs Value Object vs POCO](https://enterprisecraftsmanship.com/posts/dto-vs-value-object-vs-poco/#:~:text=DTO%20is%20a%20class%20representing%20some%20data%20with%20no%20logic%20in%20it.&text=On%20the%20other%20hand%2C%20Value,t%20have%20its%20own%20identity.)
