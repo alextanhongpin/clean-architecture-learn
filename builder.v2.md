@@ -12,12 +12,21 @@ import (
 	"strings"
 )
 
+var (
+	TypeString reflect.Type = reflect.TypeOf("")
+	TypeInt    reflect.Type = reflect.TypeOf(0)
+	TypeFloat  reflect.Type = reflect.TypeOf(0.0)
+	TypeBool   reflect.Type = reflect.TypeOf(false)
+)
+
 type User struct {
 	Name    Name
 	Age     Age
 	Hobbies []Hobby
+	Height  float32
 	Address *Address
 	Skills  []string
+	Married bool
 }
 
 type Name string
@@ -42,8 +51,10 @@ func main() {
 	// Cons: Only work with public fields at the moment, due to json unmarshaling skipping private fields.
 
 	user := NewUserBuilder().
-		Set("Name", "john").
-		Set("Age", 10).
+		SetString("Name", "John").
+		SetInt("Age", 10).
+		SetBool("Married", true).
+		SetFloat("Height", 167.0).
 		Set("Hobbies", []string{"dancing"}).
 		Set("Address", (*Address)(nil)). // This is different from new(Address).
 		Set("Skills", []string{"JavaScript"}).
@@ -64,6 +75,7 @@ func main() {
 }
 
 type Builder[T any] struct {
+	name   string
 	values map[string]interface{}
 	meta   map[string]reflect.Type
 }
@@ -76,9 +88,10 @@ func NewBuilder[T any](t T) func() *Builder[T] {
 		f := val.Type().Field(i)
 		meta[f.Name] = f.Type
 	}
-
+	name := reflect.TypeOf(t).Name()
 	return func() *Builder[T] {
 		return &Builder[T]{
+			name:   name,
 			values: make(map[string]interface{}),
 			meta:   meta,
 		}
@@ -92,7 +105,11 @@ func (b *Builder[T]) SetMap(kv map[string]interface{}) *Builder[T] {
 	return b
 }
 
-func (b *Builder[T]) Set(key string, value interface{}) *Builder[T] {
+func (b *Builder[T]) isMatchingType(src, tgt reflect.Type) bool {
+	return src == tgt || tgt.ConvertibleTo(src)
+}
+
+func (b *Builder[T]) setterType(key string) reflect.Type {
 	t, ok := b.meta[key]
 	if !ok {
 		panic(fmt.Errorf("key does not exist: %s", key))
@@ -100,7 +117,51 @@ func (b *Builder[T]) Set(key string, value interface{}) *Builder[T] {
 	if _, isSet := b.values[key]; isSet {
 		panic(fmt.Errorf("key has been set: %s", key))
 	}
+	return t
+}
 
+func (b *Builder[T]) SetString(key, value string) *Builder[T] {
+	t := b.setterType(key)
+	if !b.isMatchingType(t, TypeString) {
+		panic(fmt.Errorf("type does not match: expected %s, got %s", t, TypeString))
+	}
+
+	b.values[key] = value
+	return b
+}
+
+func (b *Builder[T]) SetInt(key string, value int) *Builder[T] {
+	t := b.setterType(key)
+	if !b.isMatchingType(t, TypeInt) {
+		panic(fmt.Errorf("type does not match: expected %s, got %s", t, TypeInt))
+	}
+
+	b.values[key] = value
+	return b
+}
+
+func (b *Builder[T]) SetFloat(key string, value float64) *Builder[T] {
+	t := b.setterType(key)
+	if !b.isMatchingType(t, TypeFloat) {
+		panic(fmt.Errorf("type does not match: expected %s, got %s", t, TypeFloat))
+	}
+
+	b.values[key] = value
+	return b
+}
+
+func (b *Builder[T]) SetBool(key string, value bool) *Builder[T] {
+	t := b.setterType(key)
+	if !b.isMatchingType(t, TypeBool) {
+		panic(fmt.Errorf("type does not match: expected %s, got %s", t, TypeBool))
+	}
+
+	b.values[key] = value
+	return b
+}
+
+func (b *Builder[T]) Set(key string, value interface{}) *Builder[T] {
+	t := b.setterType(key)
 	tt := reflect.TypeOf(value)
 
 	switch t.Kind() {
@@ -108,8 +169,8 @@ func (b *Builder[T]) Set(key string, value interface{}) *Builder[T] {
 		t = t.Elem()
 		tt = tt.Elem()
 	}
-	valid := t == tt || tt.ConvertibleTo(t)
-	if !valid {
+
+	if !b.isMatchingType(t, tt) {
 		panic(fmt.Errorf("type does not match: expected %s, got %s", t, tt))
 	}
 
@@ -141,7 +202,7 @@ func (b *Builder[T]) Build() T {
 
 			}
 		}
-		panic(fmt.Errorf("fields not set: %s", strings.Join(fieldsNotSet, ", ")))
+		panic(fmt.Errorf("%s fields not set: %s", b.name, strings.Join(fieldsNotSet, ", ")))
 	}
 
 	return b.BuildPartial()
