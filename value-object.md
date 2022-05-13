@@ -319,7 +319,7 @@ func main() {
 	fmt.Println(email.Value())
 
 	var email2 *Email
-	// fmt.Println(email2.Value()) // panic
+	fmt.Println(email2.Value())
 	fmt.Println(email2.Validate())
 
 	var email3 Email
@@ -332,8 +332,17 @@ type Email struct {
 	constructed bool
 }
 
+/* NOTE: This will cause panic, since the e is nil
 func (e *Email) Value() (string, error) {
 	return e.value, e.Validate()
+}
+*/
+
+func (e *Email) Value() (string, error) {
+	if err := e.Validate(); err != nil {
+		return "", err
+	}
+	return e.value, nil
 }
 
 func (e *Email) Validate() error {
