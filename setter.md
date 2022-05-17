@@ -118,3 +118,72 @@ func (f *Field[T]) Set(t T) {
 func (f *Field[T]) Dirty() bool {
 	return f.dirty
 }
+// Alternative
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import "fmt"
+
+func main() {
+	var count int
+	incr := func() {
+		count++
+	}
+	fmt.Println(RetFunc(1, incr))
+	fmt.Println(RetFunc("hello", incr))
+	fmt.Println(count)
+	
+	req := NewRequired("name")
+	fmt.Println(req)
+	Require("name", "John", req.Set)
+	fmt.Println(req, req.Valid())
+}
+
+func RetFunc[T any](t T, fn func()) T {
+	fn()
+	return t
+}
+
+func Require[T any](name string, t T, fn func(string)) T {
+	fn(name)
+	return t
+}
+
+type Required struct {
+	fields map[string]bool
+}
+
+func NewRequired(field string, fields ...string) *Required {
+	fields = append(fields, field)
+	req := &Required{make(map[string]bool)}
+	for _, f := range fields {
+		req.Add(f)
+	}
+	return req
+}
+func (r *Required) Add(name string) {
+	if _, ok := r.fields[name]; ok {
+		panic("already add")
+	}
+	r.fields[name] = false
+}
+
+func (r *Required) Set(name string) {
+	if ok, exists := r.fields[name]; ok {
+		panic("already set")
+	} else if !exists {
+		panic("not exists")
+	}
+	r.fields[name] = true
+}
+
+func (r Required) Valid() bool {
+	var count int
+	for _, v := range r.fields {
+		if v {
+			count++
+		}
+	}
+	return count == len(r.fields)
+}
