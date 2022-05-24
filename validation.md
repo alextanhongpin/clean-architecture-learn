@@ -169,6 +169,13 @@ func (u *User) Email() (*Email, error) {
 }
 ```
 
+## Client-side validation
+
+- often, validation for CRUD forms needs to share the same validation logic with Front-end
+- we can use the same json schemas, so the json schemas can be hosted on the backend, and client can fetch the json schema when loading the form (or keep it locally)
+- frontend can always fetch the latest or a specific version (both has pros and cons)
+- alternatively, BE can provide an endpoint to validate the request before sending the actual one (a dry-run, indicated by the query string `validateOnly` for example) 
+
 
 # References
 [^1]: [StackOverflow: What is the difference between invariants and validation rules](https://stackoverflow.com/questions/30190302/what-is-the-difference-between-invariants-and-validation-rules)
