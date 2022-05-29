@@ -165,7 +165,9 @@ email, _ := NewEmail(emailFromDB)
 
 The takeaway is, when reading value objects, they can be invalid (if they are not set). However, when writing, they have to be valid.
 
-## 2022: My take on value object now
+## ~My take on value object now~ 
+
+(Deprecated, see below)
 
 Given the same `Password` example above, I would have write it this way now below.
 
@@ -462,6 +464,105 @@ func (e *Email) Self() *Email {
 }
 ```
 
+## Value object, golang 
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"strings"
+)
+
+var (
+	ErrEmailNotSet   = errors.New("email not set")
+	ErrEmailInvalid  = errors.New("email is invalid")
+)
+
+func main() {
+	email := Email("john.doe@mail.com")
+	fmt.Println(email, email.Valid(), email.Validate())
+
+	var email2 *Email
+	fmt.Println(email2, email2.Valid(), email2.Validate())
+
+	var email3 Email
+	fmt.Println(email3, email3.Valid(), email3.Validate())
+
+	b, err := json.Marshal(email)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(b))
+
+	user := &User{email: email}
+	fmt.Println(user.Validate())
+}
+
+var ErrUserNotFound = errors.New("user not found")
+
+type User struct {
+	email Email
+}
+
+func (u *User) IsZero() bool {
+	return u == nil || *u == User{}
+}
+
+func (u *User) Validate() error {
+	if u.IsZero() {
+		return ErrUserNotFound
+	}
+	return u.email.Validate()
+}
+
+/* This is not preferred, since we have to override the MarshalJSON/UnmarshalJSON everytime.
+Instead, using a normal type alias makes it easier to be set as fields at presentation or persistence layer.
+sqlc for example, allows overriding table columns with custom types,
+hence reducing the need for manual mapping or construction of value object.
+Also, the `constructed` field is not related to the domain.
+type Email struct {
+	value       string
+	constructed bool
+}
+*/
+
+type Email string
+
+func (e *Email) IsZero() bool {
+	return e == nil || len(*e) == 0
+}
+
+func (e *Email) Valid() bool {
+	return e.Validate() == nil
+}
+
+func (e *Email) Validate() error {
+	if e.IsZero() {
+		return ErrEmailNotSet
+	}
+
+	// Naive checking - don't do this in production, this is only for demonstration purpose.
+	if !strings.Contains(string(*e), "@") {
+		return ErrEmailInvalid
+	}
+
+	return nil
+}
+
+/* For value object, this will lead to a lot of error checking
+Instead, delegate the checking in the root aggregate,
+that is the entity with the email field
+so that the aggregate can be checked as a whole.
+func NewEmail(v string) (e Email, err error) {
+	e = Email(v)
+	err = e.Validate()
+	return
+}
+*/
+```
 # References
 
 1. [DTO vs Value Object vs POCO](https://enterprisecraftsmanship.com/posts/dto-vs-value-object-vs-poco/#:~:text=DTO%20is%20a%20class%20representing%20some%20data%20with%20no%20logic%20in%20it.&text=On%20the%20other%20hand%2C%20Value,t%20have%20its%20own%20identity.)
