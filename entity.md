@@ -114,6 +114,14 @@ Setters on domain model shoyld onlybe used to modify entity fields without viola
 
 However, due to the private fields, you will end up with huge constructorvwhen setting the fields, or you might need to expose alternative and every setters that are invariant free (or by checking if value is valid before setting). The solution is to just separate the construction of the domain model to the builder.
 
+## Public/Private fields
+
+Should fields be set to private with getter/setter?
+
+https://stackoverflow.com/questions/35832379/oop-private-field-or-private-property-setter-in-regards-to-ddd
+
+
+
 ## References
 
 1. [StackOverflow: Validation in Domain Model of Domain Service](https://stackoverflow.com/questions/35934713/validation-in-domain-model-of-domain-service)
