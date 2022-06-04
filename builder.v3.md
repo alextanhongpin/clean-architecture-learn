@@ -121,16 +121,19 @@ func Set[T any](name string, t T, setter interface{ Set(name string) bool }) T {
 ## Another variation, handles ignored fields
 
 ```go
-// You can edit this code!
-// Click here and start typing.
 package main
 
 import (
 	"errors"
 	"fmt"
+	"os"
 	"reflect"
+	"strconv"
 	"strings"
+	"testing"
 )
+
+var _ = os.Setenv("DEBUG_CTOR", "true")
 
 type User struct {
 	Name    string
@@ -150,30 +153,57 @@ func NewUser(name string, age int, married bool, hobbies []string) *User {
 
 var UserConstructor = ConstructorFactory(User{})
 
-func main() {
-	ctor := UserConstructor()
-	u := User{
-		Name:    Set("Name", "john", ctor),
-		Age:     Set("Age", 10, ctor),
-		Married: Set("Married", false, ctor),
-		hobbies: Set("hobbies", []string{}, ctor),
-	}
-	if err := ctor.Validate(); err != nil {
-		panic(err)
-	}
-	fmt.Println(u)
+var user User
 
-	ctor = UserConstructor()
-	u2 := NewUser(
-		Set("Name", "john", ctor),
-		Set("Age", 10, ctor),
-		Set("Married", false, ctor),
-		Set("hobbies", []string{}, ctor),
-	)
-	if err := ctor.Validate(); err != nil {
-		panic(err)
+func BenchmarkCtor(b *testing.B) {
+	var u User
+	for i := 0; i < b.N; i++ {
+		ctor := UserConstructor()
+		u = User{
+			Name:    Set("Name", "john", ctor),
+			Age:     Set("Age", 10, ctor),
+			Married: Set("Married", false, ctor),
+			hobbies: Set("hobbies", []string{}, ctor),
+		}
+		if err := ctor.Validate(); err != nil {
+			panic(err)
+		}
 	}
-	fmt.Println(u2)
+	user = u
+}
+
+var user2 User
+
+func BenchmarkCtorNullObject(b *testing.B) {
+	var u User
+	for i := 0; i < b.N; i++ {
+		var ctor *Constructor[User]
+		u = User{
+			Name:    Set("Name", "john", ctor),
+			Age:     Set("Age", 10, ctor),
+			Married: Set("Married", false, ctor),
+			hobbies: Set("hobbies", []string{}, ctor),
+		}
+		if err := ctor.Validate(); err != nil {
+			panic(err)
+		}
+	}
+	user2 = u
+}
+
+var user3 User
+
+func BenchmarkNormal(b *testing.B) {
+	var u User
+	for i := 0; i < b.N; i++ {
+		u = User{
+			Name:    "john",
+			Age:     10,
+			Married: false,
+			hobbies: []string{},
+		}
+	}
+	user3 = u
 }
 
 type constructor interface {
@@ -187,21 +217,35 @@ func Set[T constructor, K any](name string, k K, t T) K {
 	return k
 }
 
-func ConstructorFactory[T any](unk T) func() *Constructor[T] {
-	t := reflect.Indirect(reflect.ValueOf(unk)).Type()
+func envBool(name string) bool {
+	ok, _ := strconv.ParseBool(os.Getenv(name))
+	return ok
+}
 
-	fields := make(map[string]int, t.NumField())
-	for i := 0; i < t.NumField(); i++ {
-		f := t.Field(i)
-		if f.Tag.Get("construct") == "-" {
-			fields[f.Name] = -i
-		} else {
-			fields[f.Name] = i
+func ConstructorFactory[T any](unk T) func() *Constructor[T] {
+	debug := envBool("DEBUG_CTOR")
+	if !debug {
+		return func() *Constructor[T] {
+			return nil
 		}
 	}
 
+	t := reflect.Indirect(reflect.ValueOf(unk)).Type()
+
+	var ignore int
+	fields := make([]string, t.NumField())
+	for i := 0; i < t.NumField(); i++ {
+
+		f := t.Field(i)
+		if f.Tag.Get("construct") == "-" {
+			ignore |= 1 << i
+		}
+
+		fields[i] = f.Name
+	}
+
 	return func() *Constructor[T] {
-		return NewConstructor[T](fields)
+		return NewConstructor[T](fields, ignore)
 	}
 }
 
@@ -211,16 +255,24 @@ var (
 )
 
 type Constructor[T any] struct {
+	fields []string
 	set    int
-	fields map[string]int
+	ignore int
 }
 
-func NewConstructor[T any](fields map[string]int) *Constructor[T] {
-	return &Constructor[T]{fields: fields}
+func NewConstructor[T any](fields []string, ignore int) *Constructor[T] {
+	return &Constructor[T]{
+		fields: fields,
+		ignore: ignore,
+	}
 }
 
 func (c *Constructor[T]) Set(name string) bool {
-	i, ok := c.fields[name]
+	if c == nil {
+		return true
+	}
+
+	i, ok := c.indexOf(name)
 	if !ok {
 		return false
 	}
@@ -237,19 +289,15 @@ func (c *Constructor[T]) Set(name string) bool {
 	return true
 }
 
-func (c *Constructor[T]) isSet(bit int) bool {
-	return c.set&bit == bit
-}
-
 func (c *Constructor[T]) Validate() error {
-	unsetFields := make([]string, 0, len(c.fields))
-	for f, i := range c.fields {
-		if i < 0 {
-			continue
-		}
+	if c == nil {
+		return nil
+	}
 
+	unsetFields := make([]string, 0, len(c.fields))
+	for i, f := range c.fields {
 		bit := 1 << i
-		if c.isSet(bit) {
+		if c.isSet(bit) || c.isIgnore(bit) {
 			continue
 		}
 
@@ -262,6 +310,42 @@ func (c *Constructor[T]) Validate() error {
 
 	return nil
 }
+
+func (c *Constructor[T]) isSet(bit int) bool {
+	return c.set&bit == bit
+}
+
+func (c *Constructor[T]) isIgnore(bit int) bool {
+	return c.ignore&bit == bit
+}
+
+func (c *Constructor[T]) indexOf(name string) (int, bool) {
+	for i, f := range c.fields {
+		if f == name {
+			bit := 1 << i
+			if c.ignore&bit == bit {
+				return -i, true
+			}
+			return i, true
+		}
+	}
+
+	return 0, false
+}
+```
+
+Benchmark result:
+
+```
+goos: darwin
+goarch: amd64
+pkg: github.com/alextanhongpin/ctor
+cpu: Intel(R) Core(TM) i5-6267U CPU @ 2.90GHz
+BenchmarkCtor-4                  5696067               207.4 ns/op
+BenchmarkCtorNullObject-4       47534419                24.12 ns/op
+BenchmarkNormal-4               411184291                2.931 ns/op
+PASS
+ok      github.com/alextanhongpin/ctor  4.614s
 ```
 
 
