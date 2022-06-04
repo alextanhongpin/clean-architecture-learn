@@ -206,6 +206,37 @@ func BenchmarkNormal(b *testing.B) {
 	user3 = u
 }
 
+var user4 User
+
+func BenchmarkConstructor(b *testing.B) {
+	var u *User
+	for i := 0; i < b.N; i++ {
+		u = NewUser("john", 10, false, []string{})
+	}
+
+	user4 = *u
+}
+
+var user5 User
+
+func BenchmarkConstructorCtor(b *testing.B) {
+	var u *User
+	for i := 0; i < b.N; i++ {
+		ctor := UserConstructor()
+		u = NewUser(
+			Set("Name", "john", ctor),
+			Set("Age", 10, ctor),
+			Set("Married", false, ctor),
+			Set("hobbies", []string{}, ctor),
+		)
+		if err := ctor.Validate(); err != nil {
+			panic(err)
+		}
+	}
+
+	user5 = *u
+}
+
 type constructor interface {
 	Set(name string) bool
 }
@@ -341,13 +372,14 @@ goos: darwin
 goarch: amd64
 pkg: github.com/alextanhongpin/ctor
 cpu: Intel(R) Core(TM) i5-6267U CPU @ 2.90GHz
-BenchmarkCtor-4                  5696067               207.4 ns/op
-BenchmarkCtorNullObject-4       47534419                24.12 ns/op
-BenchmarkNormal-4               411184291                2.931 ns/op
+BenchmarkCtor-4                  5465547               217.1 ns/op
+BenchmarkCtorNullObject-4       45910035                24.57 ns/op
+BenchmarkNormal-4               412362188                2.946 ns/op
+BenchmarkConstructor-4          24110187                48.74 ns/op
+BenchmarkConstructorCtor-4       4541757               263.9 ns/op
 PASS
-ok      github.com/alextanhongpin/ctor  4.614s
+ok      github.com/alextanhongpin/ctor  7.205s
 ```
-
 
 ## Conclusion
 
