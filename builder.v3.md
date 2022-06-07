@@ -121,7 +121,7 @@ func Set[T any](name string, t T, setter interface{ Set(name string) bool }) T {
 ## Another variation, handles ignored fields
 
 ```go
-package main
+package main_test
 
 import (
 	"errors"
@@ -307,13 +307,10 @@ func (c *Constructor[T]) Set(name string) bool {
 	if !ok {
 		return false
 	}
-	if i < 0 {
-		return true
-	}
 
 	bit := 1 << i
-	if c.isSet(bit) {
-		return false
+	if c.isSet(bit) || c.isIgnore(bit) {
+		return c.isIgnore(bit)
 	}
 
 	c.set |= bit
@@ -353,10 +350,6 @@ func (c *Constructor[T]) isIgnore(bit int) bool {
 func (c *Constructor[T]) indexOf(name string) (int, bool) {
 	for i, f := range c.fields {
 		if f == name {
-			bit := 1 << i
-			if c.ignore&bit == bit {
-				return -i, true
-			}
 			return i, true
 		}
 	}
