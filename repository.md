@@ -34,6 +34,7 @@ for repository, we may also want to distinguish between update put and patch. ca
    - It makes testing harder, it is harder to override the transaction or will lead to nested transaction
 - do i need repository for the reason of enabling swapping or db or mocking of db? Nope, both is not a strong reason to have repository layer because you need to test your queries against your external store/remote data anyway (not necessarily sql). But repository do hide the complexity of the query and make it reusable. 
 - repository has its own dto model, which will map back to the domain model. the mapping is done in the repository layer. https://softwareengineering.stackexchange.com/questions/404076/domain-vs-entities-model-domain-driven-design-ddd
+- should repository return domain models? Yes
 
 ## About persistence
 - should one repository map to one database table? Nope, you should never create a repository for each table in the database. (See [1]).
