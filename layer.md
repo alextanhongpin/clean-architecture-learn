@@ -22,3 +22,8 @@ https://martinfowler.com/bliki/LocalDTO.html
 https://stackoverflow.com/questions/21554977/should-services-always-return-dtos-or-can-they-also-return-domain-models
 
 Having different types at each layer increases the conversion or mapping between dofferent types. Also, changes on the inner fields affects all outer layers.
+
+
+Note
+- one common misunderstanding of layers is that they tend to be separate package or module etc. Doing so could increase the number types conversion.
+- we could instead place all of those related code in a single package
