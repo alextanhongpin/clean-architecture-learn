@@ -23,3 +23,10 @@ https://softwareengineering.stackexchange.com/questions/356106/ddd-why-is-it-a-b
 
 ## Nesting entity
 https://stackoverflow.com/questions/50889425/creating-nested-entities-through-an-aggregate-root-ddd
+
+
+## Should aggregate returns error or boolean?
+
+That depends 
+- boolean only represents yes or no. If the aggregate method could potentially return multiple errors to indicate which steps fails, error is better
+- boolean does not give information on the error, hence the error has to be called by the client. If the errors are the same, then it will be repeated multiple times. It depends on whether the error really reside in the usecase layer or domain layer. 
