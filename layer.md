@@ -26,4 +26,6 @@ Having different types at each layer increases the conversion or mapping between
 
 Note
 - one common misunderstanding of layers is that they tend to be separate package or module etc. Doing so could increase the number types conversion.
-- we could instead place all of those related code in a single package
+- we could instead place all of those related code in a single package. This is the concept known as vertical slicing
+
+
