@@ -10,6 +10,7 @@ Primitive obsession is an anti-pattern, and value objects are highly recommended
 - Value Objects do contain logic and, typically, they are not used for transferring data between application boundaries.
 - value object does not have identity, so no id field
 - good contender of value object is stock quantity, age, email
+- another way to see valueobject is it just wraps the primitives with logic
 
 # Example
 
