@@ -120,6 +120,15 @@ Should fields be set to private with getter/setter?
 
 https://stackoverflow.com/questions/35832379/oop-private-field-or-private-property-setter-in-regards-to-ddd
 
+## Separating data from methods
+
+If we dont use private fields, we end up exposing the fields to mutations. This is fine, granted that we go with immutable domain models. This domain models are mostlyread only fields with possible some getters for computed value. Those getters could call another function or service to decorate the model with more meaningful data. For example, a person object may have a getter age, that calls a function calculate age. 
+This allows calculate age to function to be used elsewhere, while avoiding imports when calling the getter.
+
+Thedomain model should not have any methods that mutates itself. Instead, it should be passed to a service or function that computes the next state, akin to redux in React. The reason is simple - it is more natural to call updateDateOfBirth(user, dob) than user.withDateOfBirth/setDateOfBirth/updateDateOfBirth(dob). Generally, the setter methods assumes the user exists or have been loaded before the setter could be called. However, most of the time, it is more performant to just call update directly to the repository layer, after validating that the params are valid. 
+
+Another reason is that the behaviour of the mutation might vary based on business logic. Having several more specific methods is better than having conditionals. Setters for the purpose of setting individual fields are rarely useful (validation could have been replaced by construction of valueobject which is always valid). 
+
 
 
 ## References
