@@ -114,6 +114,8 @@ Setters on domain model shoyld onlybe used to modify entity fields without viola
 
 However, due to the private fields, you will end up with huge constructorvwhen setting the fields, or you might need to expose alternative and every setters that are invariant free (or by checking if value is valid before setting). The solution is to just separate the construction of the domain model to the builder.
 
+Another option is to just live with immutable domain models or use init only setter https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/init#:~:text=init%20(C%23%20Reference)&text=An%20init%2Donly%20setter%20assigns,%2DImplemented%20Properties%2C%20and%20Indexers.
+
 ## Public/Private fields
 
 Should fields be set to private with getter/setter?
@@ -129,7 +131,7 @@ Thedomain model should not have any methods that mutates itself. Instead, it sho
 
 Another reason is that the behaviour of the mutation might vary based on business logic. Having several more specific methods is better than having conditionals. Setters for the purpose of setting individual fields are rarely useful (validation could have been replaced by construction of valueobject which is always valid). 
 
-
+https://wiki.c2.com/?FunctionsAndDataAreSeparate
 
 ## References
 
