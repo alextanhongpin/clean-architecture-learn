@@ -10,6 +10,8 @@
 - factory can be plain functions, for complex factory that requires other 
 - when to use factory vs constructor? When the construction requires external dependency, or the output is an aggregate of muktiple entities
 - where do factory belong? still doman layer
+- in golang, every New is a factory. However, you can use Entity factory too, especially when you have dependencies to inject 
+
 
 # Builder
 
