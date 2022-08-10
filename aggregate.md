@@ -30,3 +30,6 @@ https://stackoverflow.com/questions/50889425/creating-nested-entities-through-an
 That depends 
 - boolean only represents yes or no. If the aggregate method could potentially return multiple errors to indicate which steps fails, error is better
 - boolean does not give information on the error, hence the error has to be called by the client. If the errors are the same, then it will be repeated multiple times. It depends on whether the error really reside in the usecase layer or domain layer. 
+
+
+https://www.alibabacloud.com/blog/an-in-depth-understanding-of-aggregation-in-domain-driven-design_598034
