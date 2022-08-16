@@ -1,7 +1,16 @@
 # Business rules
 
+## What constitutes of a good business rule?
+
+E.g for login usecase
+- password must be valid
+- user must notbe banned
+
+both rules above can just be a function Password
+
+
 - https://wiki.c2.com/?ExplicitBusinessRules
-- https://www2.deloitte.com/content/dam/Deloitte/dk/Documents/Grabngo/Business%20rules%20management_030221.pdf
+-https://www2.deloitte.com/content/dam/Deloitte/dk/Documents/Grabngo/Business%20rules%20management_030221.pdf
 
 - what is the difference between business rules and usecase
 - where should business rules be stored? (application layer requires redeployment, database requires changes too)
