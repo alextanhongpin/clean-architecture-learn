@@ -35,6 +35,60 @@ What is the input/output:
 - the domain services are expressed in terms of ubiquitous language and the domain type, the method arguments and the return values are proper domain classes
 - domain services accepts domain entities or value objects, carry out conditional operations on those primitives or objects, or performs business rule calculations, and then return primitives or domain entities or value objects
 
+## Service
+
+We know that domain service layer
+- is part of the domain layer
+- they should be stateless 
+- encapsulate business logic that doesn't naturally belongs to an entity
+- operates on a collection of entity
+
+This is how we usually do it
+1. Namespace the service using a struct
+```
+type UserKtpService struct {}
+```
+2. Have a validate<entity/field> method
+```
+func (u *UserKtpService) ValidateKTP(nik int64) error {}
+func (u *UserKtpService) validateAge(dob time.Time) error {}
+func (u *UserKtpService) validateAreaCode(dob time.Time) error {}
+```
+
+Disadvantages of the approach above:
+- methods can be hard to test, if they are private
+- need to instantiate the whole struct before calling the methods
+- too procedural and lacks facts, e.g. age < KtpMinAge is not as clear as UserKtpMustHaveLegalAge(age)
+
+Suggestions:
+- service methods should read like a business rules, expressing facts
+- pattern to use: <entity> must equal <fact> instead of validate<entity>, which is more readable
+- the methods should not sound ambiguous (e.g. isPaymentMethodValid vs paymentMethodMustBeValid)
+- methods that expresses action is still okay, e.g. calculateTotalCost
+
+So instead of:
+```
+validate user ktp
+- validate age
+- validate area code
+- validate date of birth
+- validate gender
+```
+We do this:
+```
+user ktp must be valid
+- user ktp age must be legal age
+- user ktp area code is valid area
+- user ktp date of birth is valid
+- user ktp gender is male or female
+```
+In code, it will be individual functions:
+UserKtpMustBeValid(nik)
+UserKtpAgeMustBeLegalAge(dob)
+UserKtpAreaCodeIsValidArea(areaCode)
+UserKtpGenderIsMaleOrFemale(gender)
+
+What do you all think? Is this a better way? :thonking:
 
 # Reference
 
