@@ -1,3 +1,8 @@
+The idea of data oriented programming is to separate behaviour from data.
+
+This is completely the opposite of object oriented programming, where behaviour and data is coupled.
+
+However, doing it at the moment with golang requires interface. 
 
 ```go
 package main
