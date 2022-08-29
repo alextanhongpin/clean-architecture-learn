@@ -121,6 +121,15 @@ func main() {
 }
 ```
 
+## Where to place error?
+
+The errors can belong to the package types. Each layer will have its own set of errors. However, all domain packages should use only domain errors. For example, service and repository layers must return domain errors. 
+
+If possible, separate validation and invariant. An example of validation error is invalid email format, or password is required. Password too short belongs to invariant, as well as validation for specific email belonging to certain organisation.
+
+
+ 
+
 # References
 1. [Martin Fowler: Replace throw with Notification](https://martinfowler.com/articles/replaceThrowWithNotification.html)
 2. [Formik validation](https://formik.org/docs/guides/validation)
