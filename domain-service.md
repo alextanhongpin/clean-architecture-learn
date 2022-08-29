@@ -6,6 +6,10 @@
 - contains business logic such as validation
 - should have as few services as possible to avoid anaemic entity model
 - often misunderstood with _application service_ layer
+- domain services should just be pure function, with the intent in the function name, and without the `Service` suffix
+- if the domain service requires dependencies, do not pass them as arguments of the function, as it becomes coupled to the method, unless the dependency is declared as an interface
+- domain model should not be able to call domain service, however domain service can call domain model
+- it is preferable to return booleans in domain model and domain model methods should only have one responsiblity. Domain service however can chain multiple domain model methods and return specific errors
 - unaware of infrastructure or overall application flow, they exclusively encapsulates business logic rules
 - a service that expresses a business logic that is not part of any aggregate root
     - e.g. you have two aggregate, Product which contains name and price. Purchase which contains purchase date, list of products ordered with quantity and product price at that time, and the payment method.
