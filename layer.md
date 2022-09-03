@@ -29,3 +29,8 @@ Note
 - we could instead place all of those related code in a single package. This is the concept known as vertical slicing
 
 
+What happens as we move on the inner layer?
+
+The outer layer implements policies of the inner layer implements rules.
+
+As we go further in, the concerns switches mainly to persistence.
