@@ -205,3 +205,4 @@ With the solution above, we can now:
 - chain the validation in a single place, which is the `user.Validate()`
 - we can still use constructor that calls the `Validate` method
 - avoid individual constructors with errors (`NewName` and `NewAge` is not required at all, since the User will be responsible for checking if all fields are valid). Also, constructor that returns errors might not be idiomatic.
+- while many people have rely on constructor to perform validation, itpose an issuesince the validation cannot be reused elsewhere, or may become hard to test if there are simply too many branches. Also, the goal of constructor should purely be constructing, not validating.
