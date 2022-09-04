@@ -1,5 +1,11 @@
 # Use deferred chain validation
 
+This topic covers the following question
+- how to validate domain model
+- how to create always valid domain model
+- where do validation belong
+- how to deal with annoying error checking
+- hot to construct and validate value object correctly
 
 In golang, the type system does not allow creation of always valid domain model. Any attempt at implementing them is futile, and hence we will stick with deferred chain validation instead.
 
