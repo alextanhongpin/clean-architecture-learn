@@ -44,7 +44,7 @@ func (s *SubscriptionPermissionChecker) CanSubscribe(subscription *Subscription,
 }
 ```
 
-We now split the authorization logic into another separate layer. If there is only one permission checking, we can also just use pure function:
+We now split the authorization logic into another separate layer. Since the method has no other dependencies, we can just use pure function:
 
 ```go
 func CanUserRoleSubscribeToSubscription(subscription *Subscription, userRole UserRole) bool {
