@@ -4,9 +4,43 @@ Value object does not have identity.
 
 Value object is used as an alternative to primitive obsession.
 
-Another good candidate is value object in service layer. Often, we want to express a business logic without depending on model identity.
+## Value object implementation
 
-For example, we may have a discount service that returns the possible discount that returns discount value object
+```go
+package main
 
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
 
-When client select the discount from the API, they can then be converted back to the value object and be compared for optimistic concurrency.
+func main() {
+	var e Email
+	fmt.Println(e.Validate())
+}
+
+var ErrEmailBadFormat = errors.New("email: bad format")
+
+type Email string
+
+func MakeEmail(email string) Email {
+	return Email(email)
+}
+
+func (e Email) String() string {
+	return string(e)
+}
+
+func (e Email) Valid() bool {
+	return strings.Contains(e.String(), "@")
+}
+
+func (e Email) Validate() error {
+	if !e.Valid() {
+		return ErrEmailBadFormat
+	}
+
+	return nil
+}
+```

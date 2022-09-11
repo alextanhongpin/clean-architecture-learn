@@ -11,6 +11,11 @@ Primitive obsession is an anti-pattern, and value objects are highly recommended
 - value object does not have identity, so no id field
 - good contender of value object is stock quantity, age, email
 - another way to see valueobject is it just wraps the primitives with logic
+- Another good candidate is value object in service layer. Often, we want to express a business logic without depending on model identity.
+- For example, we may have a discount service that returns the possible discount that returns discount value object.
+- When client select the discount from the API, they can then be converted back to the value object and be compared for optimistic concurrency.
+- In short, favor value object over DTOs.
+- value object can be easily build from any input without relying on identity, as opposed to domain model. It is hard to construct a new domain model without id, unless that is the convention set.
 
 # Example
 
@@ -166,7 +171,7 @@ email, _ := NewEmail(emailFromDB)
 
 The takeaway is, when reading value objects, they can be invalid (if they are not set). However, when writing, they have to be valid.
 
-## ~My take on value object now~ 
+## ~My take on value object now~
 
 (Deprecated, see below)
 
@@ -465,7 +470,7 @@ func (e *Email) Self() *Email {
 }
 ```
 
-## Value object, golang 
+## Value object, golang
 
 ```go
 package main

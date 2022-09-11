@@ -1,7 +1,7 @@
 # Domain Model
 
 
-- Depending on your understanding, there may be no difference between domain model and domain entity 
+- Depending on your understanding, there may be no difference between domain model and domain entity
 - However, for certain application, it is better to split the domain model and entity
 - entity are data that mimics the database table, while domain may be similar to or represent a subset of the entity
 - in some language or when using, the domain entity may contain database specific mappings (e.g. golang's gorm or bun), however domain model should not have those details
@@ -9,6 +9,7 @@
 - the opposite is true, domain entity should not contain domain models or value object
 - domain methods should not contain accepts external input - the computed values should be based solely on itself. Delegate such operations to domain services instead.
 - side-effects (date time, random number) should be modelled externally for testability
+- if the domain logic does not rely on the identity of the domain model, separate it into value object or service layer, to promote reusability.
 
 ## Domain model should not have methods depending on external input
 
