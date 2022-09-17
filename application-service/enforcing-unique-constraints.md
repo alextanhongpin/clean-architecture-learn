@@ -4,7 +4,7 @@ Context:
 - we want to enforce unique email upon user registration. Which layer do we handle that?
 
 Explanation:
-- For uniqueness, we cannot perform them at the domain service layer - the problem with this is the information of the unique email is only known to the database. 
+- For uniqueness, we cannot perform them at the domain service layer - the problem with this is the information of the unique email is only known to the database.
 - Why not check if the email exists first? Simple, the system may not be consistent yet. Which means, we may validate that the email does not exists, but there is always a chance that the email may be inserted into the database by another concurrent request before the current one is completed. We can say that the validation is deferred until the actual user is actually inserted into the database.
 
 
@@ -95,7 +95,7 @@ class UserRepository {
 - However, now the details of the errors leaks to the repository layer. Not true, let the entity throw error.
 - Also, the implementation is very database specific, and now the user have to enforce checking for the database duplicate error and propagating them to the application service. Update: its fine, it is better than leaking the database internals up to application service - it means no swapping db.
 - This example is fine, because it has only a single entry point (registration), and a single unique constraints. What if we have an entity with multiple unique constraints, and the validation logic needs to be repeated for updates? That is the main reason why business logic should be in the entity layer. Update: yes, let the entity throw the error,
-- In a way, this is actually the preffered method. it has less complexity. entity cannot call repository, but the opposite holds true. Also, the errors could be domain errors, if we handle the db specific errors at the application layer, we are already losing the possibility to swap database. 
+- In a way, this is actually the preffered method. it has less complexity. entity cannot call repository, but the opposite holds true. Also, the errors could be domain errors, if we handle the db specific errors at the application layer, we are already losing the possibility to swap database.
 
 Improvement to 2) by enforcing the repository to call either one of the entity's method upon success/failure:
 
