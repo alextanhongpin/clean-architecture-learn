@@ -4,8 +4,8 @@
 - not to be confused with _domain service_ (aka business layer), application service does not contain business logic
 - common flow: find an entity, execute domain service, persist entity through repository
 - Is controller an application service? See [1]. Nope, in _clean architecture_ controller is primary adapter. The controller calls the application service.
-- Application service is the glue code for domain services and repository, domain service performs business logic, repository persist them. 
-- Other adapters such as logging, auth, message bus may be called here 
+- Application service is the glue code for domain services and repository, domain service performs business logic, repository persist them.
+- Other adapters such as logging, auth, message bus may be called here
 - The outer layer only knows the inner layer one layer below
 - The inner layer does not know the outer layer
 - responsible for executing transactions, see [3]
@@ -32,10 +32,10 @@
 - accepts and returns service contract objects or request/response objects, e.g. dto. So if the domain has a _User_ entity, then a simplified _UserDto_ can be returned. The adapter/transformer/converter to convert between entity and dto can lie in the application service layer.
 - does not accept or return domain entities or value objects. The reason for this is that we do not want to expose the domain models in the outer layer. Any operations by the entity can only happen in the application service and the layers below. The output should be immutable, and that is why DTO is often recommended as the toutput value. Some people design application services as command handlers, which does not return anything, which makes me wonder how the testing is done.
 - note, an alternative design is to return DPO, aka domain payload object https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture
-- the above is mostly for anemic data model (or immutable) 
+- the above is mostly for anemic data model (or immutable)
 - can an application service update multiple entity at the same time? Only if they belong to the same aggregate root. What if we need to update an unrelated entity? We do so by publishing an event.
-- anstraction hides implementation, so avoid abstracting things you want to make it clear. Abstract things like server implementation/database transaction setup, but dont abtract things related to business logic. 
-- usecase accepts a request, and returns a response. Although it should not return domain objects, most of the time, it is simpler as it reduces mapping. Suitable if your domain model is anemic with only getters but no setters. An alternative is to separate mutation domain logic from the entity (read only or compute methods is fine) and put it in service layer (some language like julia dont have classes and the struct cant have methods). This works well with go especially when you want to keep the domain fields public since without it, you will end up with super long constructor to init the private fields. 
+- anstraction hides implementation, so avoid abstracting things you want to make it clear. Abstract things like server implementation/database transaction setup, but dont abtract things related to business logic.
+- usecase accepts a request, and returns a response. Although it should not return domain objects, most of the time, it is simpler as it reduces mapping. Suitable if your domain model is anemic with only getters but no setters. An alternative is to separate mutation domain logic from the entity (read only or compute methods is fine) and put it in service layer (some language like julia dont have classes and the struct cant have methods). This works well with go especially when you want to keep the domain fields public since without it, you will end up with super long constructor to init the private fields.
 - treat usecase errors as part of the response. So have a dedicated error per usecase. Example of login usecase will have LoginError that could be union of UserNotFound or WrongPassword.
 
 
@@ -49,21 +49,21 @@ class ApplicationService {
     this.userRepository = userRepository
     this.userService = userService
   }
-  
+
   // Usecase to request confirmation email.
   async requestConfirmationEmail(email) {
     // 1. Repository: Find entity.
     const user = await this.userRepository.find(email)
-    
+
     // 2. Domain service: Execute business logic.
     await this.userService.validateNotYetConfirmed(user) // Throws on error.
-    
+
     // 3. Domain service: Update state of entity in-memory.
     const userWithConfirmationToken = await this.userService.createConfirmationToken(user)
-    
+
     // 4. Repository: Persist entity state.
     const token = await this.userRepository.updateConfirmationToken(user)
-    
+
     // Application service should not return entity. Either define a custom DTO, or return primitives.
     return token
   }
@@ -76,9 +76,18 @@ https://softwareengineering.stackexchange.com/questions/325996/ddd-where-to-plac
 
 https://softwareengineering.stackexchange.com/questions/168481/how-to-choose-between-using-a-domain-event-or-letting-the-application-layer-orc
 
-# DTO assembler
+## DTO assembler
 
 https://buildplease.com/pages/repositories-dto/
+
+
+## Avoiding Business logic in applications services
+
+
+How to detect signs of business logic leaking in the application service layer?
+- conditionals when handling operations (suggestion: refactor to strategy pattern, or polymorphism)
+- usecase calling another usecase to orchestrate a flow (suggestion: use domain events, or outbox pattern)
+
 # References
 
 1. [StackOverflow: Domain Service, Application Service](https://stackoverflow.com/questions/2268699/domain-driven-design-domain-service-application-service)

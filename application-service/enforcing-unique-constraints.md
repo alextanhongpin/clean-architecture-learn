@@ -1,7 +1,7 @@
 # Enforcing unique constraints
 
 Context:
-- we want to enforce unique email upon user registration. Which layer do we handle that?
+- We want to enforce unique email upon user registration. Which layer do we handle that?
 
 Explanation:
 - For uniqueness, we cannot perform them at the domain service layer - the problem with this is the information of the unique email is only known to the database.

@@ -9,7 +9,7 @@ How to handle filter options with query string?
 
 Try not to expose all fields to the public. Ideally every endpoint should serve a specific usecase.
 
-Not all filter combinations are possible, so having a more specific endpoint makes the API more reliable. 
+Not all filter combinations are possible, so having a more specific endpoint makes the API more reliable.
 
 Having a generic endpoint with all possible filter combinations makes the client more reliant on it, making it harder to change
 .
