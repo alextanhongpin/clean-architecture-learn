@@ -78,3 +78,13 @@ The number of code has increased dramatically, and it is questionable whether it
 
 
 For the implementation above, the `Librarian` is not required to be loaded to ensure the invariant when blocking `Member`. We might have violated the layer responsibilities by placing domain logic (who can block member) in the repository layer. But in some scenarios, it is worth the trade-off (one single query vs multiple queries to fetch the domain entities).
+
+When applied to bulk operations, it will definitely be more performant if the records does not need to be loaded first. In general, the usecase layer only checks if such operations can be carried out, which might not be DDD.
+
+## Locking and transactional script
+
+
+For some cases, such as balance, you might need to lock the row first to prevent concurrent updates.
+
+In such scenario, the application service may become more aware of such operations, unless it is abstracted in the repository layer.
+
