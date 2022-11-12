@@ -2,7 +2,7 @@
 Learnings from clean architecture
 
 
-Domain layer
+Domain layer (innermost)
 - Domain events
 - Entities
 - Services
@@ -10,15 +10,15 @@ Domain layer
 - Value objects
 - Aggregates
 
-Application layer
+Application layer (middle)
 - Application service, transaction happens here
 - Repositories
 - Message brokers, adapters
 - Workers
 - Authorization
 
-Outermost
-- controllers
+Presentation (outermost)
+- controllers (REST) or resolver (Graphql)
 - Authentication 
 - Serialiser, logging, tracing metrics
 
