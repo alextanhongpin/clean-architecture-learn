@@ -1,7 +1,7 @@
 # Designing access-control for applications
 
 Context:
-You need to restrict user's access to specific resources or operations based on certain criteria.
+You need to restrict user's access to specific resources or operations based on certain criteria. Access control is not part of domain-driven design.
 
 Some applications benefits greatly from proper access-control
 - admin-facing application
