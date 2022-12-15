@@ -61,6 +61,9 @@ What is an Aggregate?
 
 
 
+## Complex Application
+
+- https://www.alibabacloud.com/blog/how-to-code-complex-applications-core-java-technology-and-architecture_595506?spm=a2c65.11461447.0.0.2ae134ffVGA3P9
 
 
 # References
@@ -68,6 +71,6 @@ What is an Aggregate?
 [^1]: [StackOverflow: UseCase-Drive vs Domain-Driven](https://stackoverflow.com/questions/3173070/design-methodology-use-case-driven-vs-domain-driven)
 
 where to put domain services
-https://stackoverflow.com/questions/48200345/ddd-where-should-logic-go-that-tests-the-existence-of-an-entity
-https://medium.com/geekculture/an-introduction-to-domain-driven-design-f29fc1877e2a
-https://stackoverflow.com/questions/48200345/ddd-where-should-logic-go-that-tests-the-existence-of-an-entity
+- https://stackoverflow.com/questions/48200345/ddd-where-should-logic-go-that-tests-the-existence-of-an-entity
+- https://medium.com/geekculture/an-introduction-to-domain-driven-design-f29fc1877e2a
+- https://stackoverflow.com/questions/48200345/ddd-where-should-logic-go-that-tests-the-existence-of-an-entity
