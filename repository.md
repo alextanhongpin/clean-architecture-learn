@@ -85,6 +85,16 @@ There are some scenarios that would eventually lead to that:
 
 Instead of fetching the data you need individually with many small repository method, handle them in a single method and return the aggregate instead. This simplifies the usecase layer.
 
+# Stores
+
+The repository ahould just be a facade that connects multiple sources.
+
+- repository is not equal to ORM or raw SQL queries, though it can be
+- sometimes it is easier to abstract orm and table specific queries into stores
+- stores are essentially implementation details, and one repository can have multiple stores
+- an example is an AuthRepository, which may call both the UserStore and AccountStore
+
+
 # References
 
 1. [Microsoft DDD CQRS Pattern: Infrastructure Persistence Layer Design](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design#:~:text=Repositories%20are%20classes%20or%20components,required%20to%20access%20data%20sources.&text=Conceptually%2C%20a%20repository%20encapsulates%20a,closer%20to%20the%20persistence%20layer.)
