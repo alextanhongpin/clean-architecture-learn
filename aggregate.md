@@ -1,7 +1,7 @@
 # Aggregate Root
 
 - Aggregate root is a collection of entities
-- each entities can be a standalone _root_ too
+- each entities can be a standalone _aggregate root_ too
 - what is the difference between aggregate root and entity? An entity may have reference to another entit. We call this associations.
 - However, aggregate consist of an aggregate root, and one or more entities that are required to perform business logic atomically.
 - You would normally have repository that returns both individual entity (usually for read) as well as aggregate (usually for write operations where the aggregate is needed to validate the dto). Repository may compose the aggregate from multiple enitity.
@@ -9,6 +9,8 @@
 - Aggregate root is responsible for the construction of the entities they owned, e.g. an `OrderCart` aggregate is responsible for adding or removing the `OrderCartItem`. However, they could be created without an identity (id), depending on whether you delegate id generation to the database or application level.
 - Most literature suggests returning the aggregate, not entity from repository. However, most aggregate are single-use only for specific scenarios, and most of them do not represent the read-only data required. So aggregate could be returned when there is a need for mutation, and not for read-only queries.
 - Aggregate can get very large if there is a lot of nested (and nested-nested entities). Hence, the construction of the aggregate should be really specific to the operation required, and the association should only be referenced by identity (foreign key) rather than the full entity.
+- Aggregate children may not outlived the parent. If the aggregate root is deleted, then the children aggregate should be deleted too.
+- Aggregate children may not be dependent on the parent - e.g. a post may have many comments. However, the operations on comments does not have to be dependent on the parent.
 
 1. https://gedgei.wordpress.com/2016/06/10/does-ddd-promote-large-aggregates/
 2. https://softwareengineering.stackexchange.com/questions/399184/how-to-create-large-readonly-entities-in-ddd

@@ -101,7 +101,7 @@ func (u User) WithPhoneNumber(phoneNumber string, exists bool) (User, error) {
 		return u, nil
 	}
 	if !checkPhoneNumberValid(phoneNumber) {
-		return u, errors.New("invalid phone number")	
+		return u, errors.New("invalid phone number")
 	}
 	u.phoneNumber = phoneNumber
 	return u, nil
@@ -120,16 +120,126 @@ Another option is to just live with immutable domain models or use init only set
 
 Should fields be set to private with getter/setter?
 
+
+There were some thoughts where all fields in a class should be private, and they can only be set through constructor or setters with validation applied to ensure the class is always valid.
+
+
+However, this approach usually ends up with a lot of code. Imagine a hypothetical scenario where a class have 80 fields - that would mean that the constructor needs to accept 80 args, as well as having 80 getters and potentially 80 setters.
+
+Instead of doing that, we can just keep the fields public, and keep the setters still. The fields can only be set using setters (this is up to PR reviews to ensure no direct setters are done), and the code is pretty much more maintainable in a way that one write less code.
+
 https://stackoverflow.com/questions/35832379/oop-private-field-or-private-property-setter-in-regards-to-ddd
+
+
+## Guard against invalid entity
+
+To guard against invalid entity, just validate them at the beginning of each layer:
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func main() {
+	fmt.Println("Hello, 世界")
+	u := &User{}
+	saveUser(NewValidate(u))
+}
+
+func saveUser(val *Validate[*User]) {
+	fmt.Println(val.Value())
+}
+
+type validatable interface {
+	Validate() error
+}
+
+// Validate is a container type that ensures that the wrapped object fulfills the interface.
+type Validate[T validatable] struct {
+	val T
+}
+
+func NewValidate[T validatable](t T) *Validate[T] {
+	return &Validate[T]{val: t}
+}
+
+func (v *Validate[T]) Value() T {
+	if err := v.val.Validate(); err != nil {
+		panic(err)
+	}
+
+	return v.val
+}
+
+type User struct {
+	Name string
+}
+
+func (u *User) Validate() error {
+	if u.Name == "" {
+		return errors.New("user: name is required")
+	}
+
+	return nil
+}
+```
+
+We can write less code this way:
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func main() {
+	fmt.Println("Hello, 世界")
+	u := &User{}
+	saveUser(u)
+}
+
+func saveUser(u *User) {
+	MustValidate(u)
+
+	fmt.Println(u)
+}
+
+type validatable interface {
+	Validate() error
+}
+
+func MustValidate(v validatable) {
+	if err := v.Validate(); err != nil {
+		panic(err)
+	}
+}
+
+type User struct {
+	Name string
+}
+
+func (u *User) Validate() error {
+	if u.Name == "" {
+		return errors.New("user: name is required")
+	}
+
+	return nil
+}
+```
 
 ## Separating data from methods
 
-If we dont use private fields, we end up exposing the fields to mutations. This is fine, granted that we go with immutable domain models. This domain models are mostlyread only fields with possible some getters for computed value. Those getters could call another function or service to decorate the model with more meaningful data. For example, a person object may have a getter age, that calls a function calculate age. 
+If we dont use private fields, we end up exposing the fields to mutations. This is fine, granted that we go with immutable domain models. This domain models are mostlyread only fields with possible some getters for computed value. Those getters could call another function or service to decorate the model with more meaningful data. For example, a person object may have a getter age, that calls a function calculate age.
 This allows calculate age to function to be used elsewhere, while avoiding imports when calling the getter.
 
-Thedomain model should not have any methods that mutates itself. Instead, it should be passed to a service or function that computes the next state, akin to redux in React. The reason is simple - it is more natural to call updateDateOfBirth(user, dob) than user.withDateOfBirth/setDateOfBirth/updateDateOfBirth(dob). Generally, the setter methods assumes the user exists or have been loaded before the setter could be called. However, most of the time, it is more performant to just call update directly to the repository layer, after validating that the params are valid. 
+Thedomain model should not have any methods that mutates itself. Instead, it should be passed to a service or function that computes the next state, akin to redux in React. The reason is simple - it is more natural to call updateDateOfBirth(user, dob) than user.withDateOfBirth/setDateOfBirth/updateDateOfBirth(dob). Generally, the setter methods assumes the user exists or have been loaded before the setter could be called. However, most of the time, it is more performant to just call update directly to the repository layer, after validating that the params are valid.
 
-Another reason is that the behaviour of the mutation might vary based on business logic. Having several more specific methods is better than having conditionals. Setters for the purpose of setting individual fields are rarely useful (validation could have been replaced by construction of valueobject which is always valid). 
+Another reason is that the behaviour of the mutation might vary based on business logic. Having several more specific methods is better than having conditionals. Setters for the purpose of setting individual fields are rarely useful (validation could have been replaced by construction of valueobject which is always valid).
 
 https://wiki.c2.com/?FunctionsAndDataAreSeparate
 
