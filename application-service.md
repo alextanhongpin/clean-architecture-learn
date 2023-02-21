@@ -38,6 +38,13 @@
 - usecase accepts a request, and returns a response. Although it should not return domain objects, most of the time, it is simpler as it reduces mapping. Suitable if your domain model is anemic with only getters but no setters. An alternative is to separate mutation domain logic from the entity (read only or compute methods is fine) and put it in service layer (some language like julia dont have classes and the struct cant have methods). This works well with go especially when you want to keep the domain fields public since without it, you will end up with super long constructor to init the private fields.
 - treat usecase errors as part of the response. So have a dedicated error per usecase. Example of login usecase will have LoginError that could be union of UserNotFound or WrongPassword.
 
+## Validation in Application Service
+
+
+- _Input validation_ should be done at presentation layer, not application service.
+- Application service should only return __ONE__ domain error to represent the error, not a list of validation input errors.
+- Input validation refers to checking if a field exists, or is non-empty, or required etc.
+- Application service should throw an exception when any of the params are invalid
 
 ## Example of Application Service
 
