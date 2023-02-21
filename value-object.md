@@ -569,6 +569,71 @@ func NewEmail(v string) (e Email, err error) {
 }
 */
 ```
+
+## Using type alias
+
+Using type alias is the preferred way when working with value object. One advantage over using struct is the values can be serialized/deserialized.
+
+```go
+package main
+
+import (
+	"errors"
+)
+
+func main() {
+	var n Name
+	MustValidate(n)
+
+	np := new(Name)
+	MustValidate(np)
+}
+
+type validatable interface {
+	Validate() error
+}
+
+func MustValidate(v validatable) {
+	if err := v.Validate(); err != nil {
+		panic(err)
+	}
+}
+
+type Name string
+
+func (n Name) Validate() error {
+	if len(n) == 0 {
+		return errors.New("name: is required")
+	}
+
+	return nil
+}
+```
+
+Serialization/deserialization is easier when working with type alias. Below, a request object with validate method:
+
+```go
+type CreateUserRequest struct {
+	Name  Name  `json:"name"`
+	Email Email `json:"email"`
+}
+
+func (r *CreateUserRequest) Validate() error {
+	err := r.Name.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = r.Email.Validate()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+```
+
+
 # References
 
 1. [DTO vs Value Object vs POCO](https://enterprisecraftsmanship.com/posts/dto-vs-value-object-vs-poco/#:~:text=DTO%20is%20a%20class%20representing%20some%20data%20with%20no%20logic%20in%20it.&text=On%20the%20other%20hand%2C%20Value,t%20have%20its%20own%20identity.)
