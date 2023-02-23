@@ -89,9 +89,18 @@ This example is simple, and we are skipping a lot of steps such as:
 
 However, in most scenarios, sticking to plain constructor keep things maintainable.
 
+## Mapping Layer
+
 Also, if your struct contains mostly public fields, you could introduce a mapping layer instead to map types from one layer to another.
 
 Using public fields avoids the mega constructor, where you have to define all private fields for the construction of a large struct.
+
+
+In a lot of scenarios, the mapping layer makes sense if we follow the following assumptions:
+
+- models cannot be created outside the domain. So for most scenarios, they are only constructed inside the application service or returned from the repository layer.
+- models are loaded only from one source. This makes it easier to debug if some fields are missing or new fields are added.
+
 
 ```go
 package main
