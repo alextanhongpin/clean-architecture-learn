@@ -243,6 +243,55 @@ Another reason is that the behaviour of the mutation might vary based on busines
 
 https://wiki.c2.com/?FunctionsAndDataAreSeparate
 
+
+## Read-only entity
+
+The traditional OOP way is to create a class with private properties, and the properties can only be accessed through getters, and mutated through setters. However, that does not seem to work well for every scenarios, especially modern applications due to the following reasons:
+
+
+- it is expensive to load entity. Say for example you want to update a user's email. It is expensive to query the user from the storage first, then calling the method `SetEmail` and then only update the user in the storage. Instead, it will be simpler to just issue `storage.UpdateUserEmail(email)`.
+- state lives in database, not app. This is a follow up to the point above. Another scenario to consider is when performing bulk update. It is far easier to update the database columns then to follow the fetch/update/save lifecycle.
+
+
+How does this affect the way we write code?
+
+- entities are now dumb getters, so we don't need private properties.
+- we can separate business logic for mutation/setters. Instead of `SetEmail` which checks if the user can set the email and the email is valid, we encapsulate the behaviour for validating email to another method (service layer). That way, the email can always be validated without first loading the user entity.
+- code becomes less OOP, and more data-oriented. We just write methods to transform/process the data.
+- models become behaviourless. The less behaviour we tie to our entity, the better. Note that there are certain scenarios where we still want to load the entity before checking if an action can be carried out. For example, if we do soft delete, then the user still exists in the db. So we have to check if the user is not soft deleted before updating the email.
+
+```js
+// Before.
+class UserUseCase {
+	async updateUserEmail(id, email) {
+		// Load the entity.
+		const user = await this.repo.find(id)
+
+		// Set (and validate) the email.
+		user.setEmail(email)
+
+		// Save the entity.
+		await this.repo.save(user)
+	}
+}
+
+// After.
+class UserUseCase {
+	async updateUserEmail(id, email) {
+		// Validate the email.
+		assertIsEmail(email)
+
+		// Issue command to db to update the user's email.
+		await this.repo.updateUserEmail(id, email)
+	}
+}
+```
+
+What other implications that this have to other layers?
+- since our domain models are purely getters, we can pass them outside the usecase layer without worrying that clients will call setters that may modify the state of the entity
+- since behaviour is external, we can reuse it across other entities.
+
+
 ## References
 
 1. [StackOverflow: Validation in Domain Model of Domain Service](https://stackoverflow.com/questions/35934713/validation-in-domain-model-of-domain-service)
