@@ -10,3 +10,7 @@ In golang, we can probably put them in `internal/types` to indicate that they ar
 - group operation (e.g. group by etc)
 - contextkey (to define keys for custom context)
 - error (custom error types, as opposed to native error types)
+
+## Internal Types
+
+Note that the use of `internal/types` can be limiting if you intend to import the types from other packages. Internal packages are only visible within its own package.
