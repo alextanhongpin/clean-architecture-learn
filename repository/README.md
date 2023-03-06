@@ -12,3 +12,5 @@ In golang, there is no domain repository layer, which is purely the interface to
 - pagination, sort and filter
 - error handling
 - constraints and business logic in db
+
+- storage, clients and pubsub
