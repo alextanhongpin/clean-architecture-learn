@@ -6,3 +6,4 @@
 - Presentation layer should be void of domain business logic, even basic if/else
 - Versioning is usually handled in presentation layer
 - Top-level authorization should be handled here (e.g. JWT Token verification). Domain layer _may_ contain domain-specific authorization.
+- the presentation layer is also responsible for transforming the inputs (query string, params, headers) into usecase inputs.
