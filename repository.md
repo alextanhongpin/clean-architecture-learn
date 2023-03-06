@@ -1,6 +1,8 @@
 # Repository
 
 
+## What
+
 > the layer that requests external data and returns a domain entity 
 
 
@@ -10,6 +12,15 @@ external data is not necessarily related to persistence. it can be external api 
 
 - We want to separate the implementation of the persistence layer, and only expose the interfaces.
 - The goal is not to help make switching database implementation easier. But it does makes switching ORMs easier (e.g. in golang, go-pg has been superseeded by bun). 
+
+## Input and output
+
+## Behaviours
+
+## Implementation 
+
+
+## Where: Relation to other layers
 
 ## About repository
 - there are two parts, the _interface_ and also the _implementation_ layer. The interface only defines the contracts (input/output), and the implementation is storage specific. In hexagonal architecture, _interface_ is the _port_, _implementation_ is the _adapter_.
