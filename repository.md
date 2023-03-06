@@ -1,5 +1,11 @@
 # Repository
 
+
+> the layer that requests external data and returns a domain entity 
+
+
+external data is not necessarily related to persistence. it can be external api call, cache or storage object. repository connect multiple storage and client layers and returns domain entity.
+
 ## Why Repository
 
 - We want to separate the implementation of the persistence layer, and only expose the interfaces.
