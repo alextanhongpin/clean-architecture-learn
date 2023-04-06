@@ -14,3 +14,9 @@ In golang, there is no domain repository layer, which is purely the interface to
 - constraints and business logic in db
 
 - storage, clients and pubsub
+
+
+## Pagination
+
+
+usually pagination is not really a domain concern. Most data related to query, if void of business logic are usually not part of domain, unless they have some complex conditional (e.g. dont show out of stock products for certain categories).
