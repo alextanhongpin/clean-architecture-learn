@@ -36,6 +36,7 @@
 - can an application service update multiple entity at the same time? Only if they belong to the same aggregate root. What if we need to update an unrelated entity? We do so by publishing an event.
 - anstraction hides implementation, so avoid abstracting things you want to make it clear. Abstract things like server implementation/database transaction setup, but dont abtract things related to business logic.
 - usecase accepts a request, and returns a response. Although it should not return domain objects, most of the time, it is simpler as it reduces mapping. Suitable if your domain model is anemic with only getters but no setters. An alternative is to separate mutation domain logic from the entity (read only or compute methods is fine) and put it in service layer (some language like julia dont have classes and the struct cant have methods). This works well with go especially when you want to keep the domain fields public since without it, you will end up with super long constructor to init the private fields.
+- conclusion: return getter domain objects. move the mutation to service layer to reduce types conversion. this reduces the chance of the presentatioj layer from invoking methods from the domain layer that mutates its state. 
 - treat usecase errors as part of the response. So have a dedicated error per usecase. Example of login usecase will have LoginError that could be union of UserNotFound or WrongPassword.
 
 ## Validation in Application Service
