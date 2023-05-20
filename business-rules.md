@@ -27,6 +27,23 @@ Business rules and domain rules are not the same. The only similarity is that th
 
 Also, if you were to switch your app to another language and have to bring over two main things, it is the domain and business rules.
 
+### Difference between business rules and domain rules
+
+Domain includes entities and value objects. The difference between _domain_ and _business rules_ is that _domain_ is usually general, while _business rules_ is specific. Some examples below:
+
+| Domain                            | Business Rule                                               |
+| --                                | --                                                          |
+| Phone Number: format must be E164 | Supported country code is only for Malaysia and Singapore   |
+| OTP: must be at least 4 digits    | Use 6 digits for Payout OTP, use 4 digits for Auth OTP      |
+
+### Errors for domain and business rules
+
+Domain errors are usually more general. Business rules errors are more specific.
+
+
+### Creation step
+
+Creation is actually part of domain. So the params to create a new entity should belong in the domain.
 
 
 How to "document" and apply business rules in your application?
