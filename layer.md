@@ -70,3 +70,11 @@ What happens as we move on the inner layer?
 The outer layer implements policies of the inner layer implements rules.
 
 As we go further in, the concerns switches mainly to persistence.
+
+## Why layers fails
+
+Layer are just human concerns. 
+
+Layers are not independent. each layer usually calls another layer forming a gradient. That is why there can be overlap in responsibilities.
+
+Splitting code into layers is just shifting code. if we think about it, the overall logic does not change. 
