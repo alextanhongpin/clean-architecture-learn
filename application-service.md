@@ -96,6 +96,17 @@ How to detect signs of business logic leaking in the application service layer?
 - conditionals when handling operations (suggestion: refactor to strategy pattern, or polymorphism)
 - usecase calling another usecase to orchestrate a flow (suggestion: use domain events, or outbox pattern)
 
+
+## Mastery checklist 
+
+- basic crud
+- calling repositories 
+- using unit of work
+- validation 
+- testing
+- sending task to background 
+- sending task to queue
+- concurrency
 # References
 
 1. [StackOverflow: Domain Service, Application Service](https://stackoverflow.com/questions/2268699/domain-driven-design-domain-service-application-service)
