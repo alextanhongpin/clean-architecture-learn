@@ -14,3 +14,10 @@ The former does not really reduce the amount of tests written. Depending on the 
 
 Testing layer by layer requires you to mock the layer underneath, which increases the LOC for tests. Although it is not necessary to mock each layer underneath.
 
+There are also layers that you absolutely do not want to mock. for example, the business logic layer.
+
+## Testing ratio
+
+not all tests delivers the same value. The investment you get from testing the layers varies. for examples, testing the domain layer is a must.
+
+
