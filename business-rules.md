@@ -49,3 +49,14 @@ Creation is actually part of domain. So the params to create a new entity should
 How to "document" and apply business rules in your application?
 
 https://ericnormand.me/podcast/what-is-the-difference-between-a-domain-model-and-business-rules
+
+
+## Business flow
+
+Aside from domain and business rules, we also have business flow.
+
+If the business flow involves interactions with the end-users, then we usually call it usecase layer.
+
+However, if you are developing on the backend side, most of the flows that you will design involves mostly interaction between different systems (or internally).
+
+The usecase layer usually treats the system flow as a black box - they only care about the input and the output. However, what usually happens internally can be quite complex.
