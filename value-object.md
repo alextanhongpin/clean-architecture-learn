@@ -633,6 +633,10 @@ func (r *CreateUserRequest) Validate() error {
 }
 ```
 
+## Go
+
+implements valid
+implements comparable
 
 # References
 
