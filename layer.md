@@ -78,3 +78,21 @@ Layer are just human concerns.
 Layers are not independent. each layer usually calls another layer forming a gradient. That is why there can be overlap in responsibilities.
 
 Splitting code into layers is just shifting code. if we think about it, the overall logic does not change. 
+
+
+## How many layers do we need
+
+That depends on the layer 
+
+### Usecase
+
+For usecase layer, we probably only need two layers:
+
+- repository layer
+- domain service layer
+
+The repository layer here does not refer to database specific implementation. Instead, it is just a layer that is responsible for mapping any external types to a domain type. (todo: link to better articles).
+
+The repository layer will be bridge (or is it adapter?) between different data source such as APIs, database query calls or even configuration etc. There are many benefits of hiding all external calls behind the repository facade, because in reality, many operations depends on the database layer. Separating them as individual dependencies means creating more utilities to map from one layer to another.
+
+The domain service layer deserves extra attention. The goal is to eliminate inline logic, which usually results in hard to test code (link reference here). This also allows us to swap implementation, inspect and intercept the request and response with hooks. 
