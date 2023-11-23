@@ -94,6 +94,11 @@ UserKtpGenderIsMaleOrFemale(gender)
 
 What do you all think? Is this a better way? :thonking:
 
+## Domain service as actor
+
+If the business logic cannot be executed by the entity itself, it means it requires an actor. We can use the actor role as the name if the service instead. For example, a Book entity dan have a Librarian service that organizes the list of books. The Librarian can also AddToCatalog (create).
+
+
 # Reference
 
 1. [StackOverflow: Can Domain Services access Repositories?](https://stackoverflow.com/questions/26930131/can-domain-services-access-repositories)
