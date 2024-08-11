@@ -14,4 +14,9 @@
 - request parsing: parse raw data into DTOs, or data transfer object
 - response parsing: map response from application service layer into 
  presentation layer type. For JSON API, it can be serialising the output object/class into JSON payload
-
+- perform input validation and sanitization. this layer returns a special error ValidationError
+- transforms domain errors to transporter level error, e.g. http status code for rest or exit code for cli
+- does authorization
+- checks for versioning, client types
+- feature toggle
+- measure RED metrics
