@@ -22,3 +22,15 @@ For most cases, we would like to perform validation before or after the reposito
 - calls repository, message bus
 - returns read only domain types in most cases, otherwise an immutable thpe
 - sandwich of imperative shell
+
+## what does this layer does 
+
+control flow of the application 
+basically a series of steps to execute 
+- each step is usually getting input data, and transforming to output data
+- manages transaction in an application, through unit of work
+
+## what this layer shouldnt do
+
+inline business logic
+
