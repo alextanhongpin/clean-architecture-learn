@@ -63,7 +63,35 @@ REDIS_URL=
   - semver bump
 2. for stuff that needs to be done programmatically (e.g. scripts to update data, run server etc) place it under `cmd`
 
+## Adapters
 
+Most of your external packages belongs here. 
+
+Adapter contains the implementation, not abstraction, aka dont redefine another constructor etc. You are not building any reusable package here. You initialized deps here.
+
+They should be minimally defined with all configs configured for running the application. Tests environment should use hardcoded values to avoid accidentally hitting production environment.
+
+Bad:
+
+```go
+postgres.New(user, pass, host, port, db)
+```
+Good:
+```
+pg := postgres.New()
+```
+
+If you need to create separate instances, define a private constructor to declare multiple instance:
+
+
+```go
+func NewAsset() *Bucket {
+  return newBucket("assets")
+}
+func newBucket(name string) *Bucket {}
+```
+
+All dependencies should be clearly defined with zero customization.
 
 Sample implementation here:
 
