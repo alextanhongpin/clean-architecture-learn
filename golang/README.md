@@ -47,6 +47,23 @@ Good:
 REDIS_URL=
 ```
 
+## Commands
+
+1. makefile will suffice for most commands
+  - go commands
+  - dev setup
+  - db migration setup
+  - docker setup
+  - infra access cli
+  - run commands
+  - test commands (healthcheck, pings)
+  - open dashboard
+  - install tools
+  - build commands
+  - semver bump
+2. for stuff that needs to be done programmatically (e.g. scripts to update data, run server etc) place it under `cmd`
+
+
 
 Sample implementation here:
 
