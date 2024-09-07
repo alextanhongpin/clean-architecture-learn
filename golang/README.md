@@ -10,6 +10,25 @@ Application config should be loaded through environment variables only. You don'
 
 A `makefile` and a `.env` goes a long way. See the guide here on changing environment.
 
+For golang:
+1. prefer flat over nested config
+2. load all config through variables, avoid struct or map because values may be forgotten or you have to add additional logic
+3. all envvar declared cannot be empty, so panic on runtime
+4. avoid storing complicated types (json, yaml, slices)
+5. avoid third party packages ... stdlib has everything you need
+6. don't need dotenv etc
+7. keep environment variables small, merge parts when needed e.g. redis url instead of redis host+redis port
+
+
+For others:
+- store environment in .env
+- separate different environment with a suffix
+- keep secrets away from environment
+- use makefile to load environment instead of dotenv
+- switch environment with makefile
+- guard against unsafe environment like production by prompting or guarding
+
+
 #### Loading
 
 ```go
@@ -27,6 +46,8 @@ Good:
 ```
 REDIS_URL=
 ```
+
+
 Sample implementation here:
 
 https://github.com/alextanhongpin/go-clean-arch
