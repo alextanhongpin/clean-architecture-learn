@@ -18,6 +18,8 @@ For golang:
 5. avoid third party packages ... stdlib has everything you need
 6. don't need dotenv etc
 7. keep environment variables small, merge parts when needed e.g. redis url instead of redis host+redis port
+8. config values should not be exported
+9. config contains the configuration for a dependency, not the values to be used. Config can build with all the necessary values from an environment variablea, but they can still accpet other deps through dependency injection, in case they need to be shared. For shared dependencies, create a root constructor, e.g. repository creator that creates multiple repositories.
 
 
 For others:
