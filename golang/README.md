@@ -98,3 +98,10 @@ All dependencies should be clearly defined with zero customization.
 Sample implementation here:
 
 https://github.com/alextanhongpin/go-clean-arch
+
+
+Tldr, `config` package is where you declare your configuration.
+
+- does not export config values
+- exports built dependencies
+- for testing, declare a separate configuration to avoid accidentally using staging or production values
