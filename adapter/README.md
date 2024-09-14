@@ -33,3 +33,13 @@ However, what is important is that the domain layer should not depend on the ada
 If you are implementing the third party REST call, then separate the client from the adapter.
 
 The adapter layer should be responsible for converting the domain types to/from the adapter, with the condition that the domain layer should never depend on the types from the adapter.
+
+## Layer
+
+What does an adapter layer does? 
+
+It only does conversion from one type to another, nothing else.
+
+It is easy to validate the conversion happens. The target type should have all the fields filled.
+
+No layers should be accessing each other.
