@@ -103,5 +103,7 @@ https://github.com/alextanhongpin/go-clean-arch
 Tldr, `config` package is where you declare your configuration.
 
 - does not export config values
+- provides constructor without options, except dependencies. You cannot configure the built target, but you can pass existing deps, e.g. newRepo takes in a db instance
 - exports built dependencies
 - for testing, declare a separate configuration to avoid accidentally using staging or production values
+- we can use session or singleton instance. 
