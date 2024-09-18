@@ -132,3 +132,9 @@ And define the list of errors in the domain layer instead ...
 var ErrUserNotFound = errors.New("user not found")
 var ErrUserAlreadyExists = errors.New("user exists")
 ```
+
+## Patterns
+
+- break usecases: when the usecases gets too large, there may be sign it could be composed of unrelated usecases. We can apply the break pattern and separate unrelated usecases
+- group usecase: the opposite of break, we group related usecases, e.g. login and register under AuthenticationUsecase. CRUD under manage entity.
+- 
