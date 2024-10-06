@@ -78,3 +78,38 @@ func toUsecaseDto(api.Request) usecase.Dto {}
 func toRepoParams(usecase.Dto) db.Params {}
 func userResult(u *domain.User, err error) (*api.User, error) {}
 ```
+
+## Returning handlers
+
+A handler is just the method, the path and the actual handler func.
+
+Since go 1.22, we can define the method together with the path. So we can just return a map
+```go
+h := map[string]http.HandlerFunc {
+  "GET /users": listUserHandler
+}
+```
+
+This method is more convenient than returning a mux, because the path can be added to the root routes. Otherwise, one would have to nest them under a different prefix path and stripping away the prefix.
+
+Additionally, you can further wrap the handler.
+
+
+## Customizing validation 
+
+
+We can create a generic validator. However, it requires type assertions.
+
+
+```go
+reg := NewTypeRegistry()
+reg.Register(typ, func (a any) error {
+  yt := a.(YourType)
+  // return err
+})
+// Or a generic function
+Register(reg, func (yt YourType) error {
+
+})
+err := reg.Validate(typ)
+```
