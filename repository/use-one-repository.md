@@ -55,3 +55,12 @@ type AuthUsecase struct {
 </tr>
 </tbody>
 </table>
+
+## Use single repository for all usecases
+
+It will be easier to use a single repository for all usecases.
+
+So the usecase only verifies that the single repository implements all the method that is required.
+
+This reduces boilerplate a lot, as well as the number of created objects.
+
