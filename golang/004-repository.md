@@ -72,4 +72,11 @@ Should we define the repository types in entity folder? While logical, it does n
 
 Conclusion, define repository params in repository directory.
 
+## External calls
+
+Aside from database, we should also place remote api calls or message queue or redis.
+
+For redis, we do embedding.
+
+For the rest, we use special prefix like `RemoteCreateUser` to indicate it is an external API call or `Enqueue` to indicate it is a message queue.
 
