@@ -24,3 +24,9 @@ What it isn't
 - nested entities, we just have reference to the id, not nested
 - should not contain any external dependencies or config
 
+
+## Basic
+
+A domain entity can be anaemic, though that defeats the purpose.
+
+Aside from domain entity, we also
