@@ -43,3 +43,17 @@ It only does conversion from one type to another, nothing else.
 It is easy to validate the conversion happens. The target type should have all the fields filled.
 
 No layers should be accessing each other.
+
+## What belongs in adapter layer
+
+Everything that is not part of the core layer, e.g. controller, action and repository.
+
+Everything else remains in the adapter, such as but not limited to
+- jwt manager
+- logger
+- base handler
+- server
+- postgres
+
+
+Basically everything that implements something. Note that the construction is excluded and it is only done in container layer, to avoid circular dependencies.
