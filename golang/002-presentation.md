@@ -113,3 +113,7 @@ Register(reg, func (yt YourType) error {
 })
 err := reg.Validate(typ)
 ```
+
+We are not going to use this. Instead, for each request defined, we will implement a `Valid` method that returns validation errors.
+
+
