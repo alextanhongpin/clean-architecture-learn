@@ -4,6 +4,17 @@ Demonstrates how to implement a whole project based on clean architecture using 
 
 ## Structure
 
+What are the most important layers that we need in an application?
+
+- controller - where the handlers are located
+- views - if we are serving html. `templates` are placed here too
+- repository - no questions about this one
+- entity - we could call this model. has `fixtures`
+- actions - we call our application logic actions instead of usecase, because it is more intuitive, a verb. It makes the transition from controllers (nouns for resources) to actions (verbs) more natural too. Forget `usecase` and `service`
+- container - where we glue all our dependencies
+- adapters - where all third party implementation that adheres to our domain entity lies
+- cmd - the app we are starting, whether it is a cli, api server or webapp etc
+
 ### Config
 
 Application config should be loaded through environment variables only. You don't need a package manager like `viper` to load the environment variables.
