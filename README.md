@@ -1,13 +1,142 @@
-# clean-architecture-learn
-Learnings from clean architecture
+# Clean Architecture Learning Repository
 
+A comprehensive guide to clean architecture, domain-driven design, and software engineering best practices.
 
-Domain layer (innermost)
-- Domain events
-- Entities
-- Services
-- Repositories
-- Value objects
+## 📚 Repository Structure
+
+### 🔧 [fundamentals/](fundamentals/)
+Core concepts and building blocks of clean architecture:
+- **Aggregate**: Domain aggregate patterns and design
+- **Entity**: Domain entity principles and implementation
+- **Repository**: Data access patterns and best practices  
+- **Domain Service**: Business logic coordination
+- **Application Service**: Use case orchestration
+
+### 🏗️ [patterns/](patterns/)
+Advanced architectural patterns and practices:
+- **Architecture Patterns**: Feature-oriented design, hexagonal architecture
+- **Validation Patterns**: Domain vs application validation strategies
+- **Error Handling**: Error propagation and transformation patterns
+- **Persistence Patterns**: Repository design and data access strategies
+
+### 💻 [implementation/](implementation/)
+Language and framework-specific implementations:
+- **Golang**: Go-specific patterns and examples
+- **Examples**: Real-world code samples and case studies
+
+## 🎯 Learning Path
+
+### Beginner Track
+1. Start with [fundamentals/README.md](fundamentals/README.md)
+2. Read Entity and Aggregate concepts
+3. Understand Repository pattern basics
+4. Practice with simple examples
+
+### Intermediate Track  
+1. Study Domain and Application Services
+2. Learn validation and error handling patterns
+3. Explore architectural patterns
+4. Implement feature-oriented architecture
+
+### Advanced Track
+1. Master complex domain modeling
+2. Study event-driven patterns
+3. Learn microservices boundaries
+4. Practice with complete examples
+
+## 🎨 Design Principles
+
+### Core Principles
+- **Domain-Centric**: Business logic is the core of the application
+- **Dependency Inversion**: Depend on abstractions, not concretions  
+- **Separation of Concerns**: Each layer has distinct responsibilities
+- **Testability**: Design enables comprehensive testing
+
+### Architectural Goals
+- **Maintainability**: Easy to modify and extend
+- **Clarity**: Simple to understand and navigate
+- **Performance**: Efficient and scalable
+- **Reliability**: Robust error handling and recovery
+
+## 🚀 Quick Start
+
+1. **Understand the Basics**: Read [fundamentals/001-aggregate.md](fundamentals/001-aggregate.md)
+2. **See It in Action**: Check [implementation/golang/](implementation/golang/)
+3. **Go Deeper**: Explore advanced patterns in [patterns/](patterns/)
+
+## 📖 Key Concepts Summary
+
+### Domain Layer
+- **Entities**: Objects with identity and lifecycle
+- **Value Objects**: Immutable objects defined by their attributes
+- **Aggregates**: Consistency boundaries around related entities
+- **Domain Services**: Business logic that spans multiple entities
+
+### Application Layer
+- **Application Services**: Use case orchestration
+- **Command Handlers**: Process commands from presentation layer
+- **Query Handlers**: Handle read operations
+- **Event Handlers**: Process domain events
+
+### Infrastructure Layer
+- **Repositories**: Data access implementations
+- **External Services**: Third-party integrations
+- **Persistence**: Database and storage concerns
+- **Messaging**: Event publishing and handling
+
+## 🛠️ Best Practices
+
+### Code Organization
+- Use feature-oriented structure for better cohesion
+- Keep layers properly separated with clear boundaries
+- Minimize cross-cutting dependencies
+- Design for testability from the start
+
+### Domain Modeling
+- Start with understanding the business domain
+- Use ubiquitous language consistently
+- Keep aggregates small and focused
+- Validate business rules in appropriate layers
+
+### Testing Strategy
+- Unit test domain logic thoroughly
+- Integration test repository implementations
+- Use test doubles for external dependencies
+- Test error scenarios and edge cases
+
+## 🔍 Common Pitfalls to Avoid
+
+1. **Anemic Domain Models**: Putting all logic in services
+2. **God Objects**: Creating overly large aggregates
+3. **Layer Violations**: Bypassing architectural boundaries
+4. **Over-Engineering**: Adding unnecessary complexity
+5. **Infrastructure Coupling**: Binding domain to technical details
+
+## 📚 Philosophy
+
+### Pragmatic Approach
+- **Follow patterns when they solve problems you're having**
+- **Don't apply patterns blindly**
+- **Start simple and grow iteratively**
+- **Focus on business value over architectural purity**
+
+### When to Apply Clean Architecture
+- ✅ Domain logic is mixed with infrastructure concerns → Separate domain from infrastructure
+- ✅ Complex business rules → Use domain services and aggregates
+- ✅ Multiple data sources → Repository pattern helps
+- ❌ Simple CRUD operations → You probably don't need a Domain Layer
+
+## 🤝 Contributing
+
+This repository is a living document. Contributions are welcome:
+- Fix typos and improve clarity
+- Add new examples and patterns
+- Share real-world experiences
+- Suggest better organizations
+
+---
+
+**Note**: This repository focuses on practical implementation over theoretical purity. The goal is to provide actionable guidance for building maintainable software systems.
 - Aggregates
 
 Application layer (middle)
