@@ -10,6 +10,7 @@ Use repository to
 - can return more than one domain models type
 - does not imply one repo = one database table, this is wrong
 - can have business logic like unique constraints in db, converts those to domain errors
+- do not have types, as we do not qant the called to import the implementer types. as a rule, if sth needs to implement an interface, it should depend on the type
 
 Acts as a facade to
 - storage db
@@ -80,3 +81,10 @@ For redis, we do embedding.
 
 For the rest, we use special prefix like `RemoteCreateUser` to indicate it is an external API call or `Enqueue` to indicate it is a message queue.
 
+## creation forms
+
+## single
+a repo should have a single repo
+## Transaction
+
+should have a run in tx, and implement 
